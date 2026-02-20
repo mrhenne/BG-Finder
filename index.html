@@ -1,0 +1,564 @@
+import React, { useState, useMemo, useEffect } from 'react';
+import { Search, Info, Phone, ExternalLink, ShieldAlert, CheckCircle2, Moon, Sun, Copy, Check, Sparkles, AlertCircle } from 'lucide-react';
+
+// --- HILFSFUNKTION FÜR UNSCHARFE SUCHE (Levenshtein-Distanz) ---
+function getLevenshteinDistance(a, b) {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+  const matrix = [];
+  for (let i = 0; i <= b.length; i++) { matrix[i] = [i]; }
+  for (let j = 0; j <= a.length; j++) { matrix[0][j] = j; }
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1)
+        );
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+// --- DATABASE ---
+const bgData = {
+  BGW: {
+    name: "Berufsgenossenschaft für Gesundheitsdienst und Wohlfahrtspflege",
+    short: "BGW",
+    url: "https://www.bgw-online.de",
+    phone: "040 20207-0",
+    description: "Zuständig für Berufe im Gesundheitswesen, der Pflege, Tiermedizin, Friseure und Kosmetik.",
+    color: "bg-teal-100 text-teal-900 border-teal-300 dark:bg-teal-950 dark:text-teal-200 dark:border-teal-700"
+  },
+  VBG: {
+    name: "Verwaltungs-Berufsgenossenschaft",
+    short: "VBG",
+    url: "https://www.vbg.de",
+    phone: "040 5146-0",
+    description: "Zuständig für Banken, Versicherungen, Verwaltungen, freie Berufe, IT, Kirchen und Medien.",
+    color: "bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950 dark:text-blue-200 dark:border-blue-700"
+  },
+  BGBAU: {
+    name: "Berufsgenossenschaft der Bauwirtschaft",
+    short: "BG BAU",
+    url: "https://www.bgbau.de",
+    phone: "0800 814 8600",
+    description: "Zuständig für die gesamte Bauwirtschaft, Gebäudereinigung und baunahe Dienstleistungen.",
+    color: "bg-orange-100 text-orange-900 border-orange-300 dark:bg-orange-950 dark:text-orange-200 dark:border-orange-700"
+  },
+  BGHW: {
+    name: "Berufsgenossenschaft Handel und Warenlogistik",
+    short: "BGHW",
+    url: "https://www.bghw.de",
+    phone: "0621 183-0",
+    description: "Zuständig für Unternehmen des Einzelhandels, Großhandels und der Warenlogistik.",
+    color: "bg-green-100 text-green-900 border-green-300 dark:bg-green-950 dark:text-green-200 dark:border-green-700"
+  },
+  BGHM: {
+    name: "Berufsgenossenschaft Holz und Metall",
+    short: "BGHM",
+    url: "https://www.bghm.de",
+    phone: "0800 999 0080",
+    description: "Zuständig für die Holz und Metall verarbeitende Industrie und entsprechendes Handwerk.",
+    color: "bg-slate-200 text-slate-900 border-slate-400 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600"
+  },
+  BGETEM: {
+    name: "BG Energie Textil Elektro Medienerzeugnisse",
+    short: "BG ETEM",
+    url: "https://www.bgetem.de",
+    phone: "0221 3778-0",
+    description: "Zuständig für Energieversorgung, Textilindustrie, Elektrohandwerk und Druckereien.",
+    color: "bg-purple-100 text-purple-900 border-purple-300 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-700"
+  },
+  BGVERKEHR: {
+    name: "BG Verkehrswirtschaft Post-Logistik Telekommunikation",
+    short: "BG Verkehr",
+    url: "https://www.bg-verkehr.de",
+    phone: "040 3980-0",
+    description: "Zuständig für Transport, Verkehr, Postlogistik, Telekommunikation und Fliegerei.",
+    color: "bg-red-100 text-red-900 border-red-300 dark:bg-red-950 dark:text-red-200 dark:border-red-700"
+  },
+  BGRCI: {
+    name: "BG Rohstoffe und chemische Industrie",
+    short: "BG RCI",
+    url: "https://www.bgrci.de",
+    phone: "06221 5108-0",
+    description: "Zuständig für Baustoffe, Bergbau, Chemie, Leder, Papier und Zucker.",
+    color: "bg-yellow-100 text-yellow-900 border-yellow-300 dark:bg-yellow-950 dark:text-yellow-200 dark:border-yellow-700"
+  },
+  SVLFG: {
+    name: "Sozialversicherung für Landwirtschaft, Forsten und Gartenbau",
+    short: "SVLFG",
+    url: "https://www.svlfg.de",
+    phone: "0561 785-0",
+    description: "Zuständig für Landwirtschaft, Forstwirtschaft und Gartenbau.",
+    color: "bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-700"
+  },
+  BGN: {
+    name: "Berufsgenossenschaft Nahrungsmittel und Gastgewerbe",
+    short: "BGN",
+    url: "https://www.bgn.de",
+    phone: "0621 4456-0",
+    description: "Zuständig für das Hotel und Gaststättengewerbe, Bäcker, Fleischer und die Lebensmittelindustrie.",
+    color: "bg-pink-100 text-pink-900 border-pink-300 dark:bg-pink-950 dark:text-pink-200 dark:border-pink-700"
+  }
+};
+
+const professionsDatabase = [
+  // Gesundheit & Pflege
+  { title: "Krankenpfleger / Pflegefachkraft", category: "Gesundheit", bg: "BGW", keywords: ["pflege", "klinik", "hospital", "schwester", "pfleger", "krankenschwester", "intensiv", "altenpflege"] },
+  { title: "Fachpfleger für Notfallpflege", category: "Gesundheit", bg: "BGW", keywords: ["pflege", "klinik", "notaufnahme", "helios", "henne", "intensivpflege", "rettungsstelle", "erste hilfe"] },
+  { title: "Arzt / Ärztin", category: "Gesundheit", bg: "BGW", keywords: ["medizin", "klinik", "doktor", "chirurg", "mediziner", "oberarzt", "chefarzt", "doc", "hausarzt"] },
+  { title: "Rettungssanitäter", category: "Gesundheit", bg: "BGW", keywords: ["rettungsdienst", "notfall", "krankenwagen", "sani", "notfallsanitäter", "rtw", "paramedic"] },
+  { title: "Hebamme / Entbindungspfleger", category: "Gesundheit", bg: "BGW", keywords: ["geburt", "kreißsaal", "baby", "schwangerschaft", "entbindung"] },
+  { title: "Physiotherapeut", category: "Gesundheit", bg: "BGW", keywords: ["therapie", "massage", "reha", "krankengymnastik", "physio", "kneter"] },
+  { title: "Zahnarzt", category: "Gesundheit", bg: "BGW", keywords: ["zähne", "kiefer", "dentist", "zahnfee", "bohren", "zahnmedizin"] },
+  { title: "MFA / ZFA (Medizinische Fachangestellte)", category: "Gesundheit", bg: "BGW", keywords: ["praxis", "sprechstundenhilfe", "arzthelferin", "empfang", "assistenz"] },
+  { title: "Tierpfleger", category: "Gesundheit", bg: "BGW", keywords: ["tiere", "zoo", "tierarzt", "veterinär", "haustier", "tierheim", "hunde", "katzen"] },
+  { title: "Friseur / Kosmetiker", category: "Dienstleistung", bg: "BGW", keywords: ["haare", "schneiden", "beauty", "haut", "salon", "barber", "nägel"] },
+  { title: "Psychologe / Psychotherapeut", category: "Gesundheit", bg: "BGW", keywords: ["therapie", "psyche", "seelenklempner", "psychiatrie", "mental", "beratung"] },
+  { title: "Apotheker / PTA", category: "Gesundheit", bg: "BGW", keywords: ["apotheke", "medikamente", "pillen", "pharmazie", "rezept"] },
+  { title: "Logopäde / Ergotherapeut", category: "Gesundheit", bg: "BGW", keywords: ["sprache", "stimme", "motorik", "reha", "therapie", "sprechen"] },
+  
+  // Pädagogik
+  { title: "Erzieher / Sozialpädagoge", category: "Pädagogik", bg: "BGW", keywords: ["kindergarten", "kita", "schule", "betreuung", "jugendhilfe", "pädagoge", "kinder"] },
+  { title: "Lehrer (Privatschulen/Erwachsenenbildung)", category: "Pädagogik", bg: "VBG", keywords: ["schule", "unterricht", "dozent", "bildung", "lernen"] },
+
+  // IT, Medien & Kommunikation
+  { title: "Redakteur / Journalist", category: "Medien", bg: "VBG", keywords: ["journalismus", "texte", "tv", "testsieger", "presse", "autor", "schreiber", "blog", "content", "medien"] },
+  { title: "IT Systemadministrator", category: "IT", bg: "VBG", keywords: ["computer", "netzwerk", "tech", "informatik", "sysadmin", "admin", "server", "hardware", "support"] },
+  { title: "Softwareentwickler / Programmierer", category: "IT", bg: "VBG", keywords: ["programmieren", "coder", "ki", "tech", "app", "web", "entwickler", "software", "frontend", "backend"] },
+  { title: "Mediengestalter / Grafiker", category: "Medien", bg: "BGETEM", keywords: ["design", "druck", "photoshop", "layout", "kreativ", "werbung", "grafik", "zeichnen", "illustrator"] },
+  { title: "Fotograf / Kameramann", category: "Medien", bg: "VBG", keywords: ["foto", "kamera", "video", "film", "shooting", "bild"] },
+  { title: "SEO / Online Marketing Manager", category: "Medien", bg: "VBG", keywords: ["marketing", "google", "werbung", "ranking", "social media", "internet"] },
+  
+  // Verwaltung, Finanzen & Recht
+  { title: "Bürokaufmann", category: "Verwaltung", bg: "VBG", keywords: ["office", "schreibtisch", "sekretariat", "administration", "büro", "schreibtischtäter", "kaufmann"] },
+  { title: "Bankkaufmann / Finanzberater", category: "Finanzen", bg: "VBG", keywords: ["geld", "krypto", "bitcoin", "bank", "kredit", "finanzen", "bänker", "berater", "börse"] },
+  { title: "Steuerberater", category: "Verwaltung", bg: "VBG", keywords: ["steuern", "finanzamt", "buchhaltung", "zahlen", "kanzlei"] },
+  { title: "Rechtsanwalt / Notar", category: "Verwaltung", bg: "VBG", keywords: ["recht", "jura", "gericht", "anwalt", "vertrag", "kanzlei", "paragraph"] },
+  { title: "Immobilienmakler", category: "Verwaltung", bg: "VBG", keywords: ["haus", "wohnung", "verkauf", "mieten", "real estate", "makler"] },
+  { title: "Callcenter Agent", category: "Dienstleistung", bg: "VBG", keywords: ["telefon", "support", "hotline", "kundenservice", "headset"] },
+  { title: "HR Manager / Personaler", category: "Verwaltung", bg: "VBG", keywords: ["personal", "recruiting", "bewerbung", "mitarbeiter", "human resources"] },
+  
+  // Bau & Reinigung
+  { title: "Maurer", category: "Bau", bg: "BGBAU", keywords: ["hausbau", "steine", "baustelle", "handwerk", "hochbau", "kelle", "beton"] },
+  { title: "Dachdecker", category: "Bau", bg: "BGBAU", keywords: ["dach", "baustelle", "handwerk", "ziegel", "pfannen", "oben"] },
+  { title: "Maler und Lackierer", category: "Bau", bg: "BGBAU", keywords: ["farbe", "streichen", "renovierung", "fassade", "anstreicher", "pinsel", "tapezieren"] },
+  { title: "Gerüstbauer", category: "Bau", bg: "BGBAU", keywords: ["gerüst", "baustelle", "höhe", "aufbau", "gestänge"] },
+  { title: "Fliesenleger", category: "Bau", bg: "BGBAU", keywords: ["fliesen", "bad", "boden", "fugen", "keramik"] },
+  { title: "Gebäudereiniger / Putzkraft", category: "Reinigung", bg: "BGBAU", keywords: ["putzen", "sauber", "reinigung", "wischen", "hygiene", "putzfrau", "reinigungskraft", "fensterputzer"] },
+  { title: "Zimmerer / Zimmermann", category: "Bau", bg: "BGBAU", keywords: ["holz", "dachstuhl", "baustelle", "balken", "sägen"] },
+  { title: "Trockenbauer", category: "Bau", bg: "BGBAU", keywords: ["rigips", "gipskarton", "innenausbau", "wand", "decke"] },
+
+  // Handwerk & Industrie
+  { title: "Tischler / Schreiner", category: "Handwerk", bg: "BGHM", keywords: ["holz", "möbel", "sägen", "werkstatt", "schreiner", "hobel", "späne"] },
+  { title: "Kfz Mechatroniker", category: "Handwerk", bg: "BGHM", keywords: ["auto", "werkstatt", "reparatur", "metall", "schrauber", "mechaniker", "kfz", "pkw", "motor"] },
+  { title: "Schlosser / Metallbauer", category: "Handwerk", bg: "BGHM", keywords: ["metall", "stahl", "eisen", "schweißen", "feile", "werkstatt", "schrauben", "schmied"] },
+  { title: "Elektriker / Elektroniker", category: "Handwerk", bg: "BGETEM", keywords: ["strom", "kabel", "installation", "energie", "elektrotechnik", "strippenzieher", "spannung", "steckdose"] },
+  { title: "Klempner / Anlagenmechaniker SHK", category: "Handwerk", bg: "BGHM", keywords: ["rohre", "wasser", "heizung", "sanitär", "bad", "gas", "installateur"] },
+  { title: "Optiker / Hörakustiker", category: "Handwerk", bg: "BGHM", keywords: ["brille", "augen", "sehen", "hören", "hörgerät", "feinmechanik"] },
+  { title: "Chemikant / Laborant", category: "Industrie", bg: "BGRCI", keywords: ["chemie", "labor", "mischen", "rohstoffe", "reagenzglas", "industrie"] },
+  { title: "Bergmann", category: "Industrie", bg: "BGRCI", keywords: ["tagebau", "untertage", "kohle", "mine", "bagger", "rohstoffe"] },
+  
+  // Handel, Logistik & Transport
+  { title: "Verkäufer im Einzelhandel", category: "Handel", bg: "BGHW", keywords: ["shop", "kasse", "supermarkt", "kaufmann", "store", "verkäuferin", "einzelhandel", "laden"] },
+  { title: "Fachkraft für Lagerlogistik / Lagerist", category: "Logistik", bg: "BGHW", keywords: ["lager", "logistik", "stapler", "gabelstapler", "kommissionierer", "wareneingang", "paket"] },
+  { title: "Kaufmann im Großhandel", category: "Handel", bg: "BGHW", keywords: ["b2b", "vertrieb", "einkauf", "import", "export"] },
+  { title: "LKW Fahrer", category: "Transport", bg: "BGVERKEHR", keywords: ["brummi", "spedition", "fahren", "logistik", "trucker", "kraftfahrer", "lkw", "fernfahrer"] },
+  { title: "Postbote / Kurier", category: "Logistik", bg: "BGVERKEHR", keywords: ["briefe", "pakete", "dhl", "zusteller", "lieferant", "postler", "post", "amazon"] },
+  { title: "Taxifahrer", category: "Transport", bg: "BGVERKEHR", keywords: ["taxi", "personenbeförderung", "auto", "chauffeur", "fahren", "cab"] },
+  { title: "Busfahrer", category: "Transport", bg: "BGVERKEHR", keywords: ["bus", "öpnv", "reisebus", "linienbus", "verkehr"] },
+  { title: "Pilot / Flugbegleiter", category: "Transport", bg: "BGVERKEHR", keywords: ["flugzeug", "fliegen", "stewardess", "luftfahrt", "airport", "flughafen"] },
+  { title: "Lokführer", category: "Transport", bg: "BGVERKEHR", keywords: ["bahn", "zug", "gleise", "eisenbahn", "schienen"] },
+  { title: "Müllwerker", category: "Dienstleistung", bg: "BGVERKEHR", keywords: ["müll", "abfall", "entsorgung", "stadtreinigung", "tonne"] },
+  { title: "Seemann / Matrose", category: "Transport", bg: "BGVERKEHR", keywords: ["schiff", "meer", "wasser", "hafen", "maritim", "frachtschiff"] },
+  
+  // Gastronomie & Lebensmittel
+  { title: "Koch / Köchin", category: "Gastronomie", bg: "BGN", keywords: ["küche", "restaurant", "essen", "kochen", "herd", "chefkoch", "pfanne", "gastronomie"] },
+  { title: "Kellner / Servicekraft", category: "Gastronomie", bg: "BGN", keywords: ["restaurant", "bedienung", "gastro", "tresen", "kellnerin", "service", "tablett", "bar"] },
+  { title: "Bäcker / Konditor", category: "Handwerk", bg: "BGN", keywords: ["brot", "brötchen", "backen", "mehl", "teig", "kuchen", "torte", "bäckerei"] },
+  { title: "Fleischer / Metzger", category: "Handwerk", bg: "BGN", keywords: ["fleisch", "wurst", "schlachter", "messer", "metzgerei", "theke"] },
+  { title: "Hotelfachmann / Rezeptionist", category: "Gastronomie", bg: "BGN", keywords: ["hotel", "rezeption", "gastgewerbe", "tourismus", "checkin", "empfang"] },
+  { title: "Brauer", category: "Industrie", bg: "BGN", keywords: ["bier", "brauerei", "hopfen", "malz", "getränke"] },
+  
+  // Natur & Sonstige
+  { title: "Landwirt", category: "Natur", bg: "SVLFG", keywords: ["bauernhof", "traktor", "tiere", "feld", "bauer", "ernte", "agrar"] },
+  { title: "Gärtner / Landschaftsbauer", category: "Natur", bg: "SVLFG", keywords: ["garten", "pflanzen", "blumen", "bäume", "rasen", "erde", "beet"] },
+  { title: "Forstwirt", category: "Natur", bg: "SVLFG", keywords: ["wald", "holzfäller", "kettensäge", "bäume", "forst"] },
+  { title: "Winzer", category: "Natur", bg: "SVLFG", keywords: ["wein", "reben", "weingut", "alkohol", "trauben"] },
+  { title: "Florist", category: "Handel", bg: "SVLFG", keywords: ["blumen", "strauß", "pflanzen", "dekoration", "binden"] },
+  { title: "Security / Sicherheitsdienst", category: "Sicherheit", bg: "VBG", keywords: ["türsteher", "wachdienst", "security", "sicherheit", "aufpassen", "wache", "objektschutz"] },
+  { title: "Eventmanager", category: "Dienstleistung", bg: "VBG", keywords: ["veranstaltung", "planung", "party", "messe", "konzert", "organisation"] }
+];
+
+export default function App() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("Alle");
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [copiedPhone, setCopiedPhone] = useState(null);
+
+  useEffect(() => {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setIsDarkMode(true);
+    }
+  }, []);
+
+  const categories = useMemo(() => {
+    const cats = new Set(professionsDatabase.map(p => p.category));
+    return ["Alle", ...Array.from(cats).sort()];
+  }, []);
+
+  // Smarte Filterlogik mit Exact Match, Fuzzy Search und Broad Match Fallback
+  const searchResults = useMemo(() => {
+    const searchLower = searchTerm.trim().toLowerCase();
+    
+    // Wenn nichts gesucht wird alles anzeigen was der Kategorie entspricht
+    if (!searchLower) {
+      return {
+        exact: professionsDatabase
+          .filter(p => selectedCategory === "Alle" || p.category === selectedCategory)
+          .sort((a, b) => a.title.localeCompare(b.title)),
+        fuzzy: [],
+        fallback: []
+      };
+    }
+
+    const exactMatches = [];
+    const fuzzyMatches = [];
+    const searchWords = searchLower.split(/\s+/).filter(w => w.length > 0);
+
+    professionsDatabase.forEach(prof => {
+      // Kategorie Filter greift immer zuerst
+      if (selectedCategory !== "Alle" && prof.category !== selectedCategory) return;
+
+      let isExact = false;
+      
+      // 1. Exakte oder partielle Übereinstimmung
+      if (
+        prof.title.toLowerCase().includes(searchLower) ||
+        prof.bg.toLowerCase().includes(searchLower) ||
+        prof.category.toLowerCase().includes(searchLower) ||
+        prof.keywords.some(kw => kw.toLowerCase().includes(searchLower) || searchLower.includes(kw.toLowerCase()))
+      ) {
+        isExact = true;
+        exactMatches.push(prof);
+      }
+
+      // 2. Unscharfe Suche (Fuzzy Matching) viel toleranter eingestellt
+      if (!isExact && searchLower.length > 1) {
+        let bestDistance = Infinity;
+        
+        const profWords = [
+          ...prof.title.toLowerCase().split(/[\s/()]+/), 
+          ...prof.keywords.map(k => k.toLowerCase()),
+          prof.category.toLowerCase()
+        ].filter(w => w.length > 1);
+
+        searchWords.forEach(sWord => {
+          // Erhöhte Toleranz für Tippfehler
+          // Bis 3 Buchstaben = 1 Fehler erlaubt, bis 6 Buchstaben = 2 Fehler, darüber = 3 Fehler
+          const threshold = sWord.length <= 3 ? 1 : (sWord.length <= 6 ? 2 : 3);
+          
+          profWords.forEach(pWord => {
+            const dist = getLevenshteinDistance(sWord, pWord);
+            if (dist <= threshold && dist < bestDistance) {
+              bestDistance = dist;
+            }
+          });
+        });
+
+        if (bestDistance !== Infinity) {
+          fuzzyMatches.push({ prof, distance: bestDistance });
+        }
+      }
+    });
+
+    // Sortieren und Limit hochsetzen auf 15 Vorschläge
+    const sortedFuzzy = fuzzyMatches
+      .sort((a, b) => a.distance - b.distance)
+      .map(item => item.prof)
+      .slice(0, 15); 
+
+    // 3. Fallback: Wenn wirklich absolut NICHTS gefunden wurde zeigen wir populäre Startpunkte
+    let fallbackMatches = [];
+    if (exactMatches.length === 0 && sortedFuzzy.length === 0) {
+       // Wir nehmen einfach ein paar prominente Berufe aus verschiedenen Kategorien
+       const fallbackTitles = ["Krankenpfleger / Pflegefachkraft", "IT-Systemadministrator", "Maurer", "Verkäufer im Einzelhandel", "Koch / Köchin"];
+       fallbackMatches = professionsDatabase.filter(p => fallbackTitles.includes(p.title));
+    }
+
+    return {
+      exact: exactMatches.sort((a, b) => a.title.localeCompare(b.title)),
+      fuzzy: sortedFuzzy,
+      fallback: fallbackMatches
+    };
+  }, [searchTerm, selectedCategory]);
+
+  const toggleTheme = () => setIsDarkMode(!isDarkMode);
+
+  const copyToClipboard = (text, type) => {
+    navigator.clipboard.writeText(text);
+    setCopiedPhone(type);
+    setTimeout(() => setCopiedPhone(null), 2000);
+  };
+
+  const ProfessionCard = ({ prof, isSuggestion, isFallback }) => {
+    const bgInfo = bgData[prof.bg];
+    return (
+      <div className={`p-5 rounded-3xl border transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 
+        ${isDarkMode 
+          ? 'bg-slate-800 border-slate-700 hover:border-slate-500 shadow-slate-900' 
+          : 'bg-white border-gray-200 hover:shadow-md'
+        } ${isSuggestion || isFallback ? 'opacity-90 border-dashed hover:opacity-100' : ''}`}
+      >
+        <div>
+          <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} flex items-center gap-2`}>
+            {prof.title}
+            {isSuggestion && <Sparkles className="w-4 h-4 text-blue-500" />}
+            {isFallback && <AlertCircle className="w-4 h-4 text-orange-500" />}
+          </h3>
+          <div className="flex flex-wrap items-center gap-2 mt-2">
+            <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${isDarkMode ? 'bg-slate-700 text-slate-200' : 'bg-gray-100 text-gray-700'}`}>
+              {prof.category}
+            </span>
+            <span className={`text-xs truncate max-w-[200px] sm:max-w-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>
+              Keywords: {prof.keywords.slice(0, 4).join(', ')}
+            </span>
+          </div>
+        </div>
+        
+        <div className={`flex flex-col sm:items-end min-w-[200px] p-3 rounded-2xl border ${bgInfo.color}`}>
+          <span className="font-extrabold text-lg flex items-center gap-1.5">
+            {bgInfo.short}
+          </span>
+          <span className="text-xs font-semibold mt-1 opacity-90 leading-tight sm:text-right">
+            {bgInfo.name}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-gray-50 text-gray-900'} p-4 md:p-8 font-sans`}>
+      <div className="max-w-6xl mx-auto space-y-8">
+        
+        {/* Header */}
+        <header className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 rounded-3xl shadow-sm border 
+          ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-200'}`}
+        >
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
+              <ShieldAlert className="w-8 h-8 text-blue-600 dark:text-blue-500" />
+              <span className={isDarkMode ? 'text-white' : 'text-gray-900'}>BG Finder Pro</span>
+            </h1>
+            <p className={`mt-1 font-medium ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>
+              Smarte Zuordnung von Berufen zur zuständigen Berufsgenossenschaft.
+            </p>
+          </div>
+          <button 
+            onClick={toggleTheme}
+            className={`p-3 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500
+              ${isDarkMode ? 'bg-slate-800 hover:bg-slate-700 text-yellow-500' : 'bg-gray-100 hover:bg-gray-200 text-slate-700'}`}
+          >
+            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            {/* Search Input Box */}
+            <div className={`p-6 rounded-3xl shadow-sm border space-y-6 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-200'}`}>
+              <div className="relative">
+                <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`} />
+                <input
+                  type="text"
+                  placeholder="Beruf oder Slang suchen (z.B. IT, Schrauber, Pfelger)..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className={`w-full pl-14 pr-4 py-4 rounded-2xl border-2 focus:outline-none transition-colors text-lg font-medium
+                    ${isDarkMode 
+                      ? 'bg-slate-950 border-slate-700 text-white focus:border-blue-500 placeholder-slate-600' 
+                      : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 placeholder-gray-400'
+                    }`}
+                />
+              </div>
+
+              {/* Categories */}
+              <div className="flex flex-wrap gap-2">
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                      selectedCategory === cat 
+                        ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' 
+                        : isDarkMode 
+                          ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white' 
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Results */}
+            <div className="space-y-6">
+              
+              {/* Direkte Treffer */}
+              {searchResults.exact.length > 0 && (
+                <div className="grid gap-4">
+                  {searchResults.exact.map((prof, idx) => (
+                    <ProfessionCard key={`exact-${idx}`} prof={prof} isSuggestion={false} isFallback={false} />
+                  ))}
+                </div>
+              )}
+
+              {/* Unscharfe Vorschläge */}
+              {searchTerm && searchResults.fuzzy.length > 0 && searchResults.exact.length === 0 && (
+                <div className="space-y-4">
+                  <div className={`flex items-center gap-2 font-bold text-lg ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                    <Sparkles className="w-5 h-5" />
+                    Meintest du vielleicht:
+                  </div>
+                  <div className="grid gap-4">
+                    {searchResults.fuzzy.map((prof, idx) => (
+                      <ProfessionCard key={`fuzzy-${idx}`} prof={prof} isSuggestion={true} isFallback={false} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Fallback Modus wenn gar nichts passt */}
+              {searchTerm && searchResults.exact.length === 0 && searchResults.fuzzy.length === 0 && searchResults.fallback.length > 0 && (
+                <div className="space-y-4">
+                  <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-orange-950/30 border-orange-900/50 text-orange-400' : 'bg-orange-50 border-orange-200 text-orange-800'}`}>
+                    <p className="font-bold flex items-center gap-2">
+                      <AlertCircle className="w-5 h-5" />
+                      Wirklich nichts gefunden für "{searchTerm}"
+                    </p>
+                    <p className="text-sm mt-1 opacity-90">Hier sind stattdessen ein paar häufig gesuchte Berufe als Startpunkt:</p>
+                  </div>
+                  <div className="grid gap-4">
+                    {searchResults.fallback.map((prof, idx) => (
+                      <ProfessionCard key={`fallback-${idx}`} prof={prof} isSuggestion={false} isFallback={true} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            
+            {/* Dynamic BG Info */}
+            {searchTerm && (searchResults.exact.length > 0 || searchResults.fuzzy.length > 0 || searchResults.fallback.length > 0) && (
+              <div className="bg-blue-600 text-white p-6 rounded-3xl shadow-lg shadow-blue-600/20 sticky top-8">
+                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                  <Info className="w-5 h-5" /> 
+                  Zuständige BG Info
+                </h3>
+                <div className="space-y-4">
+                  {(() => {
+                    const topResult = searchResults.exact.length > 0 ? searchResults.exact[0] : (searchResults.fuzzy.length > 0 ? searchResults.fuzzy[0] : searchResults.fallback[0]);
+                    const topBg = bgData[topResult.bg];
+                    return (
+                      <div className="space-y-3">
+                        <div className="font-extrabold text-2xl">{topBg.short}</div>
+                        <p className="text-sm text-blue-100 leading-relaxed font-medium">{topBg.description}</p>
+                        
+                        <div className="pt-4 border-t border-blue-500/50 space-y-3">
+                          <button 
+                            onClick={() => copyToClipboard(topBg.phone, topBg.short)}
+                            className="flex items-center gap-3 text-sm bg-blue-700/50 hover:bg-blue-700 p-3 rounded-xl w-full transition-colors group focus:outline-none"
+                          >
+                            <Phone className="w-5 h-5 text-blue-300 group-hover:text-white" />
+                            <span className="font-mono font-bold flex-1 text-left text-base">{topBg.phone}</span>
+                            {copiedPhone === topBg.short ? <Check className="w-5 h-5 text-green-400" /> : <Copy className="w-5 h-5 opacity-50 group-hover:opacity-100" />}
+                          </button>
+                          
+                          <a 
+                            href={topBg.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 text-sm bg-blue-700/50 hover:bg-blue-700 p-3 rounded-xl w-full transition-colors group focus:outline-none"
+                          >
+                            <ExternalLink className="w-5 h-5 text-blue-300 group-hover:text-white" />
+                            <span className="font-bold flex-1 text-left truncate">{topBg.url.replace('https://www.', '')}</span>
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            )}
+
+            {/* Checklist */}
+            <div className={`p-6 rounded-3xl shadow-sm border ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-200'}`}>
+              <h3 className={`font-bold text-lg mb-6 flex items-center gap-2 ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>
+                <ShieldAlert className="w-6 h-6" />
+                Unfall Checkliste
+              </h3>
+              <ul className="space-y-5">
+                <li className="flex gap-3">
+                  <div className="mt-0.5">
+                    <CheckCircle2 className={`w-5 h-5 ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`} />
+                  </div>
+                  <div>
+                    <span className={`font-bold text-sm block ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>1. Erste Hilfe</span>
+                    <span className={`text-xs mt-1 block ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Ruhe bewahren, Unfallstelle sichern, Verletzten versorgen.</span>
+                  </div>
+                </li>
+                <li className="flex gap-3">
+                  <div className="mt-0.5">
+                    <CheckCircle2 className={`w-5 h-5 ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`} />
+                  </div>
+                  <div>
+                    <span className={`font-bold text-sm block ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>2. D-Arzt aufsuchen</span>
+                    <span className={`text-xs mt-1 block ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Bei Arbeitsunfähigkeit über den Unfalltag hinaus zwingend erforderlich.</span>
+                  </div>
+                </li>
+                <li className="flex gap-3">
+                  <div className="mt-0.5">
+                    <CheckCircle2 className={`w-5 h-5 ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`} />
+                  </div>
+                  <div>
+                    <span className={`font-bold text-sm block ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>3. Dokumentation</span>
+                    <span className={`text-xs mt-1 block ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Verbandbucheintrag ist Pflicht zur rechtlichen Absicherung.</span>
+                  </div>
+                </li>
+                <li className="flex gap-3">
+                  <div className="mt-0.5">
+                    <CheckCircle2 className={`w-5 h-5 ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`} />
+                  </div>
+                  <div>
+                    <span className={`font-bold text-sm block ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>4. BG Meldung</span>
+                    <span className={`text-xs mt-1 block ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Unfallanzeige absenden (Meldepflicht bei mehr als 3 Tagen AU).</span>
+                  </div>
+                </li>
+              </ul>
+              
+              <div className={`mt-6 p-4 rounded-2xl border ${isDarkMode ? 'bg-red-950/50 border-red-900/50' : 'bg-red-50 border-red-100'}`}>
+                <p className={`text-xs font-bold leading-relaxed ${isDarkMode ? 'text-red-400' : 'text-red-800'}`}>
+                  Klinik Reminder: Nadelstichverletzungen sofort bluten lassen, spülen, dokumentieren und den Betriebsarzt oder D-Arzt aufsuchen!
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
