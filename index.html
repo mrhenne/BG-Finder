@@ -1,732 +1,145 @@
-<!DOCTYPE html>
-<html lang="de" class="antialiased">
+<!doctype html>
+<html lang="de" data-theme="system">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BG Finder Pro</title>
-  
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {},
-      }
-    }
-  </script>
-
-  <!-- React & ReactDOM -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  
-  <!-- Babel Standalone (translates JSX in the browser) -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#0a84ff"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="BG Finder">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>BG Finder 2.0</title>
+<style>
+:root{--bg:#f2f6fb;--bg2:#e8eef8;--text:#111827;--muted:#667085;--line:rgba(15,23,42,.11);--glass:rgba(255,255,255,.58);--strong:rgba(255,255,255,.8);--border:rgba(255,255,255,.72);--accent:#0a84ff;--accent2:#5856d6;--danger:#ff453a;--ok:#30d158;--shadow:0 18px 55px rgba(45,63,95,.13)}
+@media(prefers-color-scheme:dark){html[data-theme=system]{--bg:#070b12;--bg2:#0d1420;--text:#f8fafc;--muted:#98a2b3;--line:rgba(255,255,255,.1);--glass:rgba(18,25,38,.6);--strong:rgba(18,25,38,.82);--border:rgba(255,255,255,.1);--shadow:0 24px 70px rgba(0,0,0,.34)}}
+html[data-theme=dark]{--bg:#070b12;--bg2:#0d1420;--text:#f8fafc;--muted:#98a2b3;--line:rgba(255,255,255,.1);--glass:rgba(18,25,38,.6);--strong:rgba(18,25,38,.82);--border:rgba(255,255,255,.1);--shadow:0 24px 70px rgba(0,0,0,.34);color-scheme:dark}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;padding-bottom:env(safe-area-inset-bottom);color:var(--text);background:radial-gradient(circle at 10% 5%,rgba(10,132,255,.14),transparent 27%),radial-gradient(circle at 90% 20%,rgba(88,86,214,.12),transparent 28%),linear-gradient(155deg,var(--bg),var(--bg2));font-family:Inter,-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif}button,input{font:inherit;color:inherit}button{cursor:pointer}.shell{width:min(1440px,calc(100% - 28px));margin:auto}.glass{background:var(--glass);border:1px solid var(--border);box-shadow:var(--shadow);backdrop-filter:blur(28px) saturate(160%);-webkit-backdrop-filter:blur(28px) saturate(160%)}.top{position:sticky;top:max(10px,env(safe-area-inset-top));z-index:20;margin-top:10px;padding:12px 14px 12px 18px;border-radius:22px;display:flex;justify-content:space-between;align-items:center}.brand{display:flex;gap:10px;align-items:center}.logo{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;color:#fff;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 8px 24px rgba(10,132,255,.3)}.brand b,.brand small{display:block}.brand small{font-size:11px;color:var(--muted);margin-top:2px}.actions{display:flex;gap:8px}.icon{width:42px;height:42px;border-radius:14px;border:1px solid var(--line);background:var(--strong)}main{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(310px,.75fr);gap:22px;padding:26px 0 64px}.hero{grid-column:1/-1;border-radius:30px;padding:clamp(26px,4vw,54px);position:relative;overflow:hidden}.eyebrow{display:block;color:var(--accent);font-size:12px;font-weight:850;text-transform:uppercase;letter-spacing:.12em}.hero h1{font-size:clamp(34px,5.7vw,70px);line-height:.99;letter-spacing:-.055em;margin:14px 0 16px;max-width:1100px}.hero h1 span{color:var(--muted)}.hero p{max-width:820px;color:var(--muted);line-height:1.6;margin:0}.search{margin-top:28px;position:relative}.search input{width:100%;padding:20px 54px;border-radius:20px;border:1px solid var(--line);background:var(--strong);font-size:18px}.search .mag{position:absolute;left:19px;top:50%;transform:translateY(-50%) rotate(-18deg);font-size:26px;color:var(--muted)}.clear{position:absolute;right:12px;top:50%;transform:translateY(-50%);border:0;background:transparent;font-size:25px;color:var(--muted)}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}.chip,.pill{border:1px solid var(--line);background:var(--strong);border-radius:999px;padding:8px 11px;font-size:12px;color:var(--muted)}.sectionhead{display:flex;justify-content:space-between;align-items:end;gap:12px;margin:10px 3px 14px}.sectionhead h2{margin:5px 0 0;font-size:26px;letter-spacing:-.035em}.textbtn{border:0;background:transparent;color:var(--accent);font-weight:750}.topgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.topcard,.result{border:1px solid var(--line);background:var(--glass);box-shadow:0 10px 30px rgba(45,63,95,.07);transition:.18s;border-radius:18px}.topcard:hover,.result:hover{transform:translateY(-2px);border-color:rgba(10,132,255,.35);background:var(--strong)}.topcard{min-height:108px;text-align:left;padding:13px;display:flex;flex-direction:column;justify-content:space-between}.rank{font-size:11px;color:var(--muted);font-weight:850}.topname{font-size:14px;font-weight:800;line-height:1.22}.carrier{font-size:12px;color:var(--accent);font-weight:850}.results{display:grid;gap:9px}.result{width:100%;padding:17px;text-align:left;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}.resulttitle{font-size:17px;font-weight:850}.meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px}.tag{min-width:108px;text-align:center;padding:11px;border-radius:14px;background:linear-gradient(135deg,rgba(10,132,255,.14),rgba(88,86,214,.13));border:1px solid rgba(10,132,255,.2);color:var(--accent);font-weight:900}.count{color:var(--muted);font-size:12px}.detail,.notice{border-radius:22px;padding:21px}.detail{position:sticky;top:86px;min-height:390px}.empty{min-height:345px;display:grid;place-items:center;align-content:center;text-align:center}.emptyi{width:64px;height:64px;border-radius:22px;display:grid;place-items:center;font-size:34px;background:rgba(10,132,255,.1);color:var(--accent);transform:rotate(-14deg)}.empty p,.notice p,.detail p{color:var(--muted);line-height:1.55;font-size:13px}.detailhead{display:flex;justify-content:space-between;gap:10px}.detail h3{font-size:24px;letter-spacing:-.04em;margin:6px 0}.fav{width:42px;height:42px;border-radius:13px;border:1px solid var(--line);background:var(--strong);font-size:20px}.fav.active{color:#ff9f0a}.dsec{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}.dlabel{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:850;color:var(--muted);margin-bottom:7px}.iklist{display:grid;gap:7px;max-height:230px;overflow:auto}.ik{display:flex;justify-content:space-between;gap:9px;padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:var(--strong)}.ik code{font-weight:850}.ik span{font-size:11px;color:var(--muted);text-align:right}.contacts{display:grid;grid-template-columns:1fr 1fr;gap:7px}.btn,.contact{border:1px solid var(--line);border-radius:13px;padding:10px 12px;background:var(--strong);font-weight:750;text-align:center;text-decoration:none;color:inherit}.primary{background:var(--accent);color:#fff;border-color:transparent}.danger{color:var(--danger);background:rgba(255,69,58,.1);border-color:rgba(255,69,58,.2)}.notice{margin-top:15px}.notice strong{color:var(--accent)}dialog{width:min(780px,calc(100% - 22px));border-radius:28px;padding:0;color:var(--text)}dialog::backdrop{background:rgba(2,6,12,.46);backdrop-filter:blur(8px)}.dialogin{padding:23px}.dialoghead{display:flex;justify-content:space-between}.settings{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:16px}.block{padding:16px;border:1px solid var(--line);border-radius:18px;background:var(--strong)}.block p,.block small{color:var(--muted);font-size:12px;line-height:1.45}.wide{grid-column:1/-1}.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.seg button{border:0;border-radius:10px;padding:9px;background:transparent}.seg button.active{background:var(--glass);font-weight:850}.row{display:flex;gap:8px}.row input{min-width:0;flex:1;border:1px solid var(--line);background:var(--glass);border-radius:12px;padding:10px}.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,18px);opacity:0;background:rgba(20,25,34,.94);color:#fff;padding:10px 14px;border-radius:999px;font-size:13px;transition:.2s;z-index:60;pointer-events:none}.toast.show{opacity:1;transform:translate(-50%,0)}.nores{border:1px dashed var(--line);border-radius:18px;padding:25px;text-align:center;color:var(--muted)}
+@media(max-width:1040px){main{grid-template-columns:1fr}.detail{position:static}.topgrid{grid-template-columns:repeat(3,1fr)}}@media(max-width:720px){.shell{width:calc(100% - 16px)}main{gap:15px;padding-top:12px}.top{border-radius:18px}.brand small{display:none}.actions{gap:5px}.icon{width:44px;height:44px}.hero{order:1}.hero+section{order:3}aside{order:2}.detail:not(.has-selection){display:none}.detail.has-selection{margin-top:-2px}.hero{padding:24px 17px;border-radius:22px}.hero h1{font-size:clamp(34px,11vw,50px)}.search input{font-size:16px;padding:17px 50px}.topgrid{grid-template-columns:repeat(2,1fr)}.result{grid-template-columns:1fr}.settings{grid-template-columns:1fr}.wide{grid-column:auto}.row,.contacts{grid-template-columns:1fr;flex-direction:column}}@media print{.top,.hero,.topgrid,.sectionhead,.notice,dialog,.toast{display:none!important}body{background:#fff;color:#000}main{display:block}.detail{box-shadow:none;border:1px solid #ccc;background:#fff}}
+</style>
 </head>
-<body class="bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-slate-100 transition-colors duration-300">
-  <div id="root"></div>
-
-  <script type="text/babel">
-    const { useState, useMemo, useEffect } = React;
-
-    // --- ICONS KOMPONENTE (Ersatz für lucide-react, 100% Standalone) ---
-    const Icon = ({ name, className }) => {
-      const paths = {
-        Search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
-        Info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
-        Phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
-        ExternalLink: '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
-        ShieldAlert: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
-        CheckCircle2: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
-        Moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
-        Sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
-        Copy: '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
-        Check: '<path d="M20 6 9 17l-5-5"/>',
-        Sparkles: '<path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>',
-        AlertCircle: '<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>',
-        Printer: '<path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/>',
-        Stethoscope: '<path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/>',
-        History: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
-        Trash2: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>'
-      };
-      return (
-        <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{ __html: paths[name] }} />
-      );
-    };
-
-    // HILFSFUNKTION FÜR UNSCHARFE SUCHE (Levenshtein-Distanz)
-    function getLevenshteinDistance(a, b) {
-      if (a.length === 0) return b.length;
-      if (b.length === 0) return a.length;
-      const matrix = [];
-      for (let i = 0; i <= b.length; i++) { matrix[i] = [i]; }
-      for (let j = 0; j <= a.length; j++) { matrix[0][j] = j; }
-      for (let i = 1; i <= b.length; i++) {
-        for (let j = 1; j <= a.length; j++) {
-          if (b.charAt(i - 1) === a.charAt(j - 1)) {
-            matrix[i][j] = matrix[i - 1][j - 1];
-          } else {
-            matrix[i][j] = Math.min(
-              matrix[i - 1][j - 1] + 1,
-              Math.min(matrix[i][j - 1] + 1, matrix[i - 1][j] + 1)
-            );
-          }
-        }
-      }
-      return matrix[b.length][a.length];
-    }
-
-    // DATABASE ERWEITERT UM UNFALLKASSEN
-    const bgData = {
-      BGW: {
-        name: "Berufsgenossenschaft für Gesundheitsdienst und Wohlfahrtspflege",
-        short: "BGW",
-        url: "https://www.bgw-online.de",
-        phone: "040 20207-0",
-        description: "Zuständig für private Kliniken, Pflege, Tiermedizin, Friseure und Kosmetik.",
-        color: "bg-teal-100 text-teal-900 border-teal-300 dark:bg-teal-950 dark:text-teal-200 dark:border-teal-700"
-      },
-      VBG: {
-        name: "Verwaltungs-Berufsgenossenschaft",
-        short: "VBG",
-        url: "https://www.vbg.de",
-        phone: "040 5146-0",
-        description: "Zuständig für Banken, Zeitarbeit, IT, Kirchen, Sportvereine und Medien.",
-        color: "bg-blue-100 text-blue-900 border-blue-300 dark:bg-blue-950 dark:text-blue-200 dark:border-blue-700"
-      },
-      BGBAU: {
-        name: "Berufsgenossenschaft der Bauwirtschaft",
-        short: "BG BAU",
-        url: "https://www.bgbau.de",
-        phone: "0800 814 8600",
-        description: "Zuständig für die Bauwirtschaft, Gebäudereinigung und baunahe Dienstleistungen.",
-        color: "bg-orange-100 text-orange-900 border-orange-300 dark:bg-orange-950 dark:text-orange-200 dark:border-orange-700"
-      },
-      BGHW: {
-        name: "Berufsgenossenschaft Handel und Warenlogistik",
-        short: "BGHW",
-        url: "https://www.bghw.de",
-        phone: "0621 183-0",
-        description: "Zuständig für Einzelhandel, Großhandel und Warenlogistik.",
-        color: "bg-green-100 text-green-900 border-green-300 dark:bg-green-950 dark:text-green-200 dark:border-green-700"
-      },
-      BGHM: {
-        name: "Berufsgenossenschaft Holz und Metall",
-        short: "BGHM",
-        url: "https://www.bghm.de",
-        phone: "0800 999 0080",
-        description: "Zuständig für Industrie und Handwerk in Holz und Metall.",
-        color: "bg-slate-200 text-slate-900 border-slate-400 dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600"
-      },
-      BGETEM: {
-        name: "BG Energie Textil Elektro Medienerzeugnisse",
-        short: "BG ETEM",
-        url: "https://www.bgetem.de",
-        phone: "0221 3778-0",
-        description: "Zuständig für Energie, Textil, Elektro und Druckereien.",
-        color: "bg-purple-100 text-purple-900 border-purple-300 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-700"
-      },
-      BGVERKEHR: {
-        name: "BG Verkehrswirtschaft Post-Logistik Telekommunikation",
-        short: "BG Verkehr",
-        url: "https://www.bg-verkehr.de",
-        phone: "040 3980-0",
-        description: "Zuständig für Transport, Logistik, Entsorgung und Fliegerei.",
-        color: "bg-red-100 text-red-900 border-red-300 dark:bg-red-950 dark:text-red-200 dark:border-red-700"
-      },
-      BGRCI: {
-        name: "BG Rohstoffe und chemische Industrie",
-        short: "BG RCI",
-        url: "https://www.bgrci.de",
-        phone: "06221 5108-0",
-        description: "Zuständig für Bergbau, Chemie, Leder und Papier.",
-        color: "bg-yellow-100 text-yellow-900 border-yellow-300 dark:bg-yellow-950 dark:text-yellow-200 dark:border-yellow-700"
-      },
-      SVLFG: {
-        name: "Sozialversicherung für Landwirtschaft, Forsten und Gartenbau",
-        short: "SVLFG",
-        url: "https://www.svlfg.de",
-        phone: "0561 785-0",
-        description: "Zuständig für Landwirtschaft, Forst und Gartenbau.",
-        color: "bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-700"
-      },
-      BGN: {
-        name: "Berufsgenossenschaft Nahrungsmittel und Gastgewerbe",
-        short: "BGN",
-        url: "https://www.bgn.de",
-        phone: "0621 4456-0",
-        description: "Zuständig für Gastronomie, Bäcker, Fleischer und Lebensmittelindustrie.",
-        color: "bg-pink-100 text-pink-900 border-pink-300 dark:bg-pink-950 dark:text-pink-200 dark:border-pink-700"
-      },
-      UK_NRW: {
-        name: "Unfallkasse Nordrhein-Westfalen",
-        short: "UK NRW",
-        url: "https://www.unfallkasse-nrw.de",
-        phone: "0211 2808-0",
-        description: "Zuständig für städtische Angestellte, kommunale Kitas, Schulen, Hochschulen und freiwillige Feuerwehren in NRW.",
-        color: "bg-cyan-100 text-cyan-900 border-cyan-300 dark:bg-cyan-950 dark:text-cyan-200 dark:border-cyan-700"
-      },
-      UK_BUND: {
-        name: "Unfallversicherung Bund und Bahn",
-        short: "UVB",
-        url: "https://www.uv-bund-bahn.de",
-        phone: "069 47863-0",
-        description: "Zuständig für Bundesbedienstete, Arbeitsagenturen und Bahnangestellte.",
-        color: "bg-indigo-100 text-indigo-900 border-indigo-300 dark:bg-indigo-950 dark:text-indigo-200 dark:border-indigo-700"
-      }
-    };
-
-    // MASSIV ERWEITERTE BERUFSDATENBANK (130+ Einträge)
-    const professionsDatabase = [
-      // Gesundheit & Soziales
-      { title: "Krankenpfleger / Pflegefachkraft (Privatklinik)", category: "Gesundheit", bg: "BGW", keywords: ["pflege", "klinik", "hospital", "krankenschwester", "intensiv", "helios"] },
-      { title: "Arzt / Ärztin (Privat/Praxis)", category: "Gesundheit", bg: "BGW", keywords: ["medizin", "klinik", "doktor", "chirurg", "hausarzt", "facharzt"] },
-      { title: "Medizinischer Fachangestellter (MFA)", category: "Gesundheit", bg: "BGW", keywords: ["arzthelferin", "praxis", "empfang", "blutabnahme"] },
-      { title: "Zahnmedizinischer Fachangestellter (ZFA)", category: "Gesundheit", bg: "BGW", keywords: ["zahnarzt", "zahnfee", "praxis", "assistenz"] },
-      { title: "Zahnarzt (Praxis)", category: "Gesundheit", bg: "BGW", keywords: ["dentist", "zähne", "kiefer", "bohren"] },
-      { title: "Physiotherapeut", category: "Gesundheit", bg: "BGW", keywords: ["massage", "reha", "krankengymnastik", "physio", "therapie"] },
-      { title: "Ergotherapeut", category: "Gesundheit", bg: "BGW", keywords: ["motorik", "reha", "therapie", "beschäftigung"] },
-      { title: "Logopäde", category: "Gesundheit", bg: "BGW", keywords: ["sprache", "stimme", "therapie", "sprechen"] },
-      { title: "Hebamme / Entbindungspfleger", category: "Gesundheit", bg: "BGW", keywords: ["geburt", "baby", "kreißsaal", "schwangerschaft"] },
-      { title: "Apotheker / PTA", category: "Gesundheit", bg: "BGW", keywords: ["apotheke", "medikamente", "pillen", "pharma"] },
-      { title: "Rettungssanitäter (Privat / HiOrg)", category: "Gesundheit", bg: "BGW", keywords: ["rettungsdienst", "rtw", "notfall", "krankenwagen", "drk", "johanniter", "malteser"] },
-      { title: "Altenpfleger (Pflegeheim / Ambulant)", category: "Gesundheit", bg: "BGW", keywords: ["pflege", "heim", "senioren", "ambulant", "betreuung"] },
-      { title: "Tierarzt / Tiermedizinischer Fachangestellter", category: "Gesundheit", bg: "BGW", keywords: ["tiere", "praxis", "veterinär", "hund", "katze"] },
-      { title: "Friseur", category: "Körperpflege", bg: "BGW", keywords: ["haare", "salon", "schneiden", "barber"] },
-      { title: "Kosmetiker", category: "Körperpflege", bg: "BGW", keywords: ["beauty", "haut", "nägel", "studio", "makeup"] },
-      { title: "Erzieher (Private Kita / Kirchlich)", category: "Pädagogik", bg: "BGW", keywords: ["kindergarten", "privat", "betreuung", "hort"] },
-
-      // Öffentlicher Dienst & Kommunales
-      { title: "Krankenpfleger / Arzt (Städtisches Klinikum)", category: "Öffentlicher Dienst", bg: "UK_NRW", keywords: ["pflege", "klinik", "kommunal", "stadt", "uniklinik"] },
-      { title: "Feuerwehrmann (Berufsfeuerwehr / Freiwillig)", category: "Öffentlicher Dienst", bg: "UK_NRW", keywords: ["feuerwehr", "brand", "rettung", "notfall", "stadt", "beamter", "löschen"] },
-      { title: "Schüler / Student / Kita-Kind", category: "Öffentlicher Dienst", bg: "UK_NRW", keywords: ["schule", "lernen", "kind", "studium", "universität", "unfall auf dem schulweg"] },
-      { title: "Lehrer (Staatliche Schule)", category: "Öffentlicher Dienst", bg: "UK_NRW", keywords: ["schule", "beamter", "unterricht", "pädagoge", "gymnasium", "grundschule"] },
-      { title: "Erzieher (Städtische Kita)", category: "Öffentlicher Dienst", bg: "UK_NRW", keywords: ["kita", "kindergarten", "stadt", "kommunal"] },
-      { title: "Verwaltungsfachangestellter (Kommune/Stadt)", category: "Öffentlicher Dienst", bg: "UK_NRW", keywords: ["rathaus", "stadtverwaltung", "amt", "bürgerbüro"] },
-      { title: "Polizist (Landespolizei)", category: "Öffentlicher Dienst", bg: "UK_NRW", keywords: ["polizei", "beamter", "uniform", "streife", "kripo"] },
-      { title: "Straßenwärter (Kommunal)", category: "Öffentlicher Dienst", bg: "UK_NRW", keywords: ["bauhof", "stadt", "straße", "meisterei"] },
-      { title: "Polizist (Bundespolizei)", category: "Öffentlicher Dienst", bg: "UK_BUND", keywords: ["bund", "grenze", "bupo", "beamter"] },
-      { title: "Soldat (Bundeswehr)", category: "Öffentlicher Dienst", bg: "UK_BUND", keywords: ["bund", "armee", "kaserne", "truppe"] },
-      { title: "Zollbeamter", category: "Öffentlicher Dienst", bg: "UK_BUND", keywords: ["zoll", "bund", "kontrolle", "beamter"] },
-      { title: "Praktikant / Bufdi / FSJ", category: "Öffentlicher Dienst", bg: "UK_NRW", keywords: ["praktikum", "fsj", "freiwillig", "praktikant"] },
-
-      // Handwerk, Bau & Gebäudemanagement
-      { title: "Maurer / Betonbauer", category: "Bau", bg: "BGBAU", keywords: ["hausbau", "baustelle", "handwerk", "hochbau", "steine", "beton"] },
-      { title: "Dachdecker", category: "Bau", bg: "BGBAU", keywords: ["dach", "baustelle", "ziegel", "höhe", "handwerk"] },
-      { title: "Fliesenleger", category: "Bau", bg: "BGBAU", keywords: ["fliesen", "bad", "boden", "fugen"] },
-      { title: "Zimmerer", category: "Bau", bg: "BGBAU", keywords: ["holz", "dachstuhl", "baustelle", "handwerk"] },
-      { title: "Gerüstbauer", category: "Bau", bg: "BGBAU", keywords: ["gerüst", "baustelle", "höhe", "gestänge"] },
-      { title: "Maler und Lackierer (Baugewerbe)", category: "Bau", bg: "BGBAU", keywords: ["farbe", "streichen", "fassade", "pinsel", "renovieren"] },
-      { title: "Straßenbauer / Tiefbauer", category: "Bau", bg: "BGBAU", keywords: ["straße", "asphalt", "bagger", "tiefbau", "baustelle"] },
-      { title: "Trockenbauer", category: "Bau", bg: "BGBAU", keywords: ["rigips", "wand", "innenausbau", "decke"] },
-      { title: "Gebäudereiniger / Putzkraft (Gewerblich)", category: "Reinigung", bg: "BGBAU", keywords: ["putzen", "sauber", "reinigung", "wischen", "hygiene", "fensterputzer"] },
-      { title: "Schornsteinfeger", category: "Handwerk", bg: "BGBAU", keywords: ["kamin", "dach", "schwarz", "essenkehrer"] },
-
-      // Industrie & Metallhandwerk
-      { title: "Kfz-Mechatroniker", category: "Handwerk", bg: "BGHM", keywords: ["auto", "werkstatt", "reparatur", "metall", "mechaniker", "schrauber"] },
-      { title: "Schlosser / Metallbauer", category: "Handwerk", bg: "BGHM", keywords: ["metall", "stahl", "eisen", "schweißen", "werkstatt"] },
-      { title: "Tischler / Schreiner", category: "Handwerk", bg: "BGHM", keywords: ["holz", "möbel", "sägen", "werkstatt", "hobel"] },
-      { title: "Anlagenmechaniker SHK (Klempner)", category: "Handwerk", bg: "BGHM", keywords: ["sanitär", "heizung", "klima", "wasser", "rohre", "installateur"] },
-      { title: "Zerspanungsmechaniker", category: "Industrie", bg: "BGHM", keywords: ["cnc", "drehen", "fräsen", "metall", "maschine"] },
-      { title: "Maschinen- und Anlagenführer", category: "Industrie", bg: "BGHM", keywords: ["produktion", "maschine", "fabrik", "fließband"] },
-      { title: "Industriemechaniker", category: "Industrie", bg: "BGHM", keywords: ["wartung", "instandhaltung", "maschine", "fabrik"] },
-      { title: "Optiker", category: "Handwerk", bg: "BGHM", keywords: ["brille", "augen", "sehen", "feinmechanik"] },
-      { title: "Hörakustiker", category: "Handwerk", bg: "BGHM", keywords: ["ohren", "hören", "hörgerät"] },
-
-      // Energie, Textil, Elektro & Medien
-      { title: "Elektriker / Elektroniker", category: "Handwerk", bg: "BGETEM", keywords: ["strom", "kabel", "installation", "energie", "spannung", "strippenzieher"] },
-      { title: "Mediengestalter (Druck/Print)", category: "Medien", bg: "BGETEM", keywords: ["design", "druck", "layout", "kreativ", "werbung"] },
-      { title: "Mechatroniker (Industrie/Anlagen)", category: "Industrie", bg: "BGETEM", keywords: ["elektro", "mechanik", "robotik", "anlagen"] },
-      { title: "Drucker / Medientechnologe", category: "Industrie", bg: "BGETEM", keywords: ["papier", "druckerei", "presse", "farbe"] },
-      { title: "Maßschneider / Textil", category: "Handwerk", bg: "BGETEM", keywords: ["nähen", "mode", "kleidung", "stoff"] },
-
-      // Verwaltung, Finanzen, IT & Dienstleistung
-      { title: "Kaufmann für Büromanagement", category: "Verwaltung", bg: "VBG", keywords: ["office", "schreibtisch", "sekretariat", "administration", "büro"] },
-      { title: "Bankkaufmann", category: "Finanzen", bg: "VBG", keywords: ["geld", "bank", "finanzen", "bänker", "kredit", "schalter"] },
-      { title: "IT-Systemadministrator", category: "IT", bg: "VBG", keywords: ["computer", "netzwerk", "tech", "informatik", "sysadmin", "server"] },
-      { title: "Softwareentwickler / Programmierer", category: "IT", bg: "VBG", keywords: ["programmieren", "coder", "ki", "tech", "app", "entwickler", "code"] },
-      { title: "Steuerfachangestellter", category: "Verwaltung", bg: "VBG", keywords: ["steuern", "finanzamt", "buchhaltung", "zahlen", "kanzlei"] },
-      { title: "Rechtsanwaltsfachangestellter", category: "Verwaltung", bg: "VBG", keywords: ["recht", "kanzlei", "anwalt", "jura", "büro"] },
-      { title: "Immobilienmakler", category: "Verwaltung", bg: "VBG", keywords: ["haus", "wohnung", "verkauf", "mieten", "real estate"] },
-      { title: "Zeitarbeiter / Leiharbeiter", category: "Dienstleistung", bg: "VBG", keywords: ["zeitarbeit", "leiharbeit", "leasing", "extern", "personaldienstleister"] },
-      { title: "Security / Sicherheitsdienst", category: "Dienstleistung", bg: "VBG", keywords: ["türsteher", "wachdienst", "aufpassen", "objektschutz", "wache"] },
-      { title: "Redakteur / Journalist (Verlag/Online)", category: "Medien", bg: "VBG", keywords: ["journalismus", "texte", "tv", "presse", "blog", "autor"] },
-      { title: "Influencer / Content Creator", category: "Medien", bg: "VBG", keywords: ["youtube", "instagram", "tiktok", "streamer", "video"] },
-      { title: "Callcenter Agent", category: "Dienstleistung", bg: "VBG", keywords: ["telefon", "support", "hotline", "headset", "kundenservice"] },
-      { title: "Architekt", category: "Verwaltung", bg: "VBG", keywords: ["planen", "zeichnen", "büro", "hausbau", "entwurf"] },
-
-      // Handel & Warenlogistik
-      { title: "Kaufmann im Einzelhandel / Verkäufer", category: "Handel", bg: "BGHW", keywords: ["shop", "kasse", "supermarkt", "store", "laden", "filiale"] },
-      { title: "Fachkraft für Lagerlogistik / Lagerist", category: "Logistik", bg: "BGHW", keywords: ["lager", "stapler", "gabelstapler", "wareneingang", "paket", "kommissionierer"] },
-      { title: "Kaufmann im Groß- und Außenhandel", category: "Handel", bg: "BGHW", keywords: ["b2b", "vertrieb", "einkauf", "import", "export", "großhandel"] },
-
-      // Transport & Verkehr
-      { title: "Berufskraftfahrer / LKW-Fahrer", category: "Transport", bg: "BGVERKEHR", keywords: ["spedition", "logistik", "trucker", "brummi", "fernfahrer"] },
-      { title: "Postbote / Paketzusteller", category: "Logistik", bg: "BGVERKEHR", keywords: ["briefe", "dhl", "abfall", "lieferant", "kurier", "amazon", "post"] },
-      { title: "Busfahrer (Privates Unternehmen)", category: "Transport", bg: "BGVERKEHR", keywords: ["reisebus", "linienbus", "öpnv", "verkehr"] },
-      { title: "Taxifahrer", category: "Transport", bg: "BGVERKEHR", keywords: ["taxi", "personenbeförderung", "auto", "chauffeur"] },
-      { title: "Müllwerker (Private Entsorgung)", category: "Dienstleistung", bg: "BGVERKEHR", keywords: ["müll", "abfall", "entsorgung", "remondis", "tonne"] },
-      { title: "Pilot / Flugbegleiter", category: "Transport", bg: "BGVERKEHR", keywords: ["flugzeug", "fliegen", "stewardess", "airport", "flughafen"] },
-      { title: "Seemann / Matrose", category: "Transport", bg: "BGVERKEHR", keywords: ["schiff", "meer", "wasser", "hafen", "frachtschiff"] },
-      { title: "Lokführer (Deutsche Bahn)", category: "Transport", bg: "UK_BUND", keywords: ["bahn", "zug", "gleise", "eisenbahn", "db", "triebfahrzeugführer"] },
-
-      // Gastronomie & Nahrungsmittel
-      { title: "Koch / Köchin", category: "Gastronomie", bg: "BGN", keywords: ["küche", "restaurant", "essen", "kochen", "herd", "chefkoch"] },
-      { title: "Restaurantfachmann / Kellner", category: "Gastronomie", bg: "BGN", keywords: ["bedienung", "gastro", "service", "bar", "tresen", "tablett"] },
-      { title: "Hotelfachmann", category: "Gastronomie", bg: "BGN", keywords: ["hotel", "rezeption", "gastgewerbe", "tourismus", "checkin"] },
-      { title: "Bäcker / Konditor", category: "Handwerk", bg: "BGN", keywords: ["brot", "brötchen", "backen", "teig", "kuchen", "torte"] },
-      { title: "Fleischer / Metzger", category: "Handwerk", bg: "BGN", keywords: ["fleisch", "wurst", "schlachter", "messer", "theke"] },
-      { title: "Brauer", category: "Industrie", bg: "BGN", keywords: ["bier", "brauerei", "hopfen", "malz", "getränke"] },
-      { title: "Fachkraft für Lebensmitteltechnik", category: "Industrie", bg: "BGN", keywords: ["produktion", "lebensmittel", "fabrik", "essen"] },
-
-      // Landwirtschaft, Forsten & Gartenbau
-      { title: "Landwirt / Bauer", category: "Natur", bg: "SVLFG", keywords: ["bauernhof", "traktor", "tiere", "feld", "ernte", "agrar", "schwein", "kuh"] },
-      { title: "Gärtner / Landschaftsbauer", category: "Natur", bg: "SVLFG", keywords: ["garten", "pflanzen", "blumen", "bäume", "rasen", "erde", "galabau"] },
-      { title: "Forstwirt / Waldarbeiter", category: "Natur", bg: "SVLFG", keywords: ["wald", "holzfäller", "kettensäge", "bäume", "forst"] },
-      { title: "Florist", category: "Handel", bg: "SVLFG", keywords: ["blumen", "strauß", "pflanzen", "dekoration", "binden"] },
-      { title: "Winzer", category: "Natur", bg: "SVLFG", keywords: ["wein", "reben", "weingut", "alkohol", "trauben"] },
-
-      // Rohstoffe & Chemie
-      { title: "Chemikant", category: "Industrie", bg: "BGRCI", keywords: ["chemie", "labor", "mischen", "rohstoffe", "produktion", "reaktor"] },
-      { title: "Chemielaborant", category: "Industrie", bg: "BGRCI", keywords: ["labor", "analyse", "proben", "reagenzglas", "forschung"] },
-      { title: "Bergmann", category: "Industrie", bg: "BGRCI", keywords: ["tagebau", "untertage", "kohle", "mine", "bagger", "rohstoffe"] },
-      { title: "Papiertechnologe", category: "Industrie", bg: "BGRCI", keywords: ["papier", "karton", "pappe", "produktion", "fabrik"] },
-      { title: "Baustoffprüfer", category: "Industrie", bg: "BGRCI", keywords: ["beton", "asphalt", "labor", "prüfung", "steine"] }
-    ];
-
-    function App() {
-      const [searchTerm, setSearchTerm] = useState("");
-      const [selectedCategory, setSelectedCategory] = useState("Alle");
-      const [isDarkMode, setIsDarkMode] = useState(false);
-      const [copiedPhone, setCopiedPhone] = useState(null);
-      const [searchHistory, setSearchHistory] = useState([]);
-
-      // Theme Initialisierung
-      useEffect(() => {
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          setIsDarkMode(true);
-        }
-      }, []);
-
-      // HTML Class umschalten für Tailwind Dark Mode
-      useEffect(() => {
-        if (isDarkMode) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-      }, [isDarkMode]);
-
-      // Verlauf aus dem Local Storage laden
-      useEffect(() => {
-        const savedHistory = localStorage.getItem('bgFinderHistory');
-        if (savedHistory) {
-          try {
-            setSearchHistory(JSON.parse(savedHistory));
-          } catch (e) {
-            console.error("Fehler beim Laden des Verlaufs", e);
-          }
-        }
-      }, []);
-
-      // Verlauf automatisch speichern (Debounce-Logik)
-      useEffect(() => {
-        const term = searchTerm.trim();
-        if (term.length < 3) return;
-
-        const timer = setTimeout(() => {
-          setSearchHistory(prevHistory => {
-            const filteredHistory = prevHistory.filter(t => t.toLowerCase() !== term.toLowerCase());
-            const newHistory = [term, ...filteredHistory].slice(0, 10);
-            localStorage.setItem('bgFinderHistory', JSON.stringify(newHistory));
-            return newHistory;
-          });
-        }, 1500);
-
-        return () => clearTimeout(timer);
-      }, [searchTerm]);
-
-      const clearHistory = () => {
-        setSearchHistory([]);
-        localStorage.removeItem('bgFinderHistory');
-      };
-
-      const categories = useMemo(() => {
-        const cats = new Set(professionsDatabase.map(p => p.category));
-        return ["Alle", ...Array.from(cats).sort()];
-      }, []);
-
-      const searchResults = useMemo(() => {
-        const searchLower = searchTerm.trim().toLowerCase();
-        
-        if (!searchLower) {
-          return {
-            exact: professionsDatabase
-              .filter(p => selectedCategory === "Alle" || p.category === selectedCategory)
-              .sort((a, b) => a.title.localeCompare(b.title)),
-            fuzzy: [],
-            fallback: false
-          };
-        }
-
-        const exactMatches = [];
-        const fuzzyMatches = [];
-        const searchWords = searchLower.split(/\s+/).filter(w => w.length > 0);
-
-        professionsDatabase.forEach(prof => {
-          if (selectedCategory !== "Alle" && prof.category !== selectedCategory) return;
-
-          let isExact = false;
-          
-          if (
-            prof.title.toLowerCase().includes(searchLower) ||
-            prof.bg.toLowerCase().includes(searchLower) ||
-            prof.category.toLowerCase().includes(searchLower) ||
-            prof.keywords.some(kw => kw.toLowerCase().includes(searchLower) || searchLower.includes(kw.toLowerCase()))
-          ) {
-            isExact = true;
-            exactMatches.push(prof);
-          }
-
-          if (!isExact && searchLower.length > 2) {
-            let bestDistance = Infinity;
-            const profWords = [
-              ...prof.title.toLowerCase().split(/[\s/()]+/), 
-              ...prof.keywords.map(k => k.toLowerCase()),
-              prof.category.toLowerCase()
-            ].filter(w => w.length > 2);
-
-            searchWords.forEach(sWord => {
-              const threshold = sWord.length <= 4 ? 1 : 2;
-              profWords.forEach(pWord => {
-                const dist = getLevenshteinDistance(sWord, pWord);
-                if (dist <= threshold && dist < bestDistance) {
-                  bestDistance = dist;
-                }
-              });
-            });
-
-            if (bestDistance !== Infinity) {
-              fuzzyMatches.push({ prof, distance: bestDistance });
-            }
-          }
-        });
-
-        const sortedFuzzy = fuzzyMatches
-          .sort((a, b) => a.distance - b.distance)
-          .map(item => item.prof)
-          .slice(0, 5); 
-
-        const isFallback = exactMatches.length === 0 && sortedFuzzy.length === 0;
-
-        return {
-          exact: exactMatches.sort((a, b) => a.title.localeCompare(b.title)),
-          fuzzy: sortedFuzzy,
-          fallback: isFallback
-        };
-      }, [searchTerm, selectedCategory]);
-
-      const toggleTheme = () => setIsDarkMode(!isDarkMode);
-
-      const copyToClipboard = (text, type) => {
-        navigator.clipboard.writeText(text);
-        setCopiedPhone(type);
-        setTimeout(() => setCopiedPhone(null), 2000);
-      };
-
-      const handlePrint = () => {
-        window.print();
-      };
-
-      const ProfessionCard = ({ prof, isSuggestion }) => {
-        const bgInfo = bgData[prof.bg];
-        return (
-          <div className={`p-5 rounded-3xl border transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 
-            ${isDarkMode 
-              ? 'bg-slate-800 border-slate-700 hover:border-slate-500 shadow-slate-900' 
-              : 'bg-white border-gray-200 hover:shadow-md'
-            } ${isSuggestion ? 'opacity-90 border-dashed' : ''}`}
-          >
-            <div>
-              <h3 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} flex items-center gap-2`}>
-                {prof.title}
-                {isSuggestion && <Icon name="Sparkles" className="w-4 h-4 text-blue-500" />}
-              </h3>
-              <div className="flex flex-wrap items-center gap-2 mt-2">
-                <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg ${isDarkMode ? 'bg-slate-700 text-slate-200' : 'bg-gray-100 text-gray-700'}`}>
-                  {prof.category}
-                </span>
-                <span className={`text-xs truncate max-w-[200px] sm:max-w-xs hidden md:inline-block ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>
-                   Keywords: {prof.keywords.slice(0, 3).join(', ')}
-                </span>
-              </div>
-            </div>
-            
-            <div className={`flex flex-col sm:items-end min-w-[200px] p-3 rounded-2xl border ${bgInfo.color}`}>
-              <span className="font-extrabold text-lg flex items-center gap-1.5">
-                {bgInfo.short}
-              </span>
-              <span className="text-xs font-semibold mt-1 opacity-90 leading-tight sm:text-right">
-                {bgInfo.name}
-              </span>
-            </div>
-          </div>
-        );
-      };
-
-      return (
-        <div className={`min-h-screen p-4 md:p-8 font-sans`}>
-          <div className="max-w-6xl mx-auto space-y-8">
-            
-            {/* Header (Wird beim Drucken ausgeblendet) */}
-            <header className={`print:hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 rounded-3xl shadow-sm border 
-              ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-200'}`}
-            >
-              <div>
-                <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
-                  <Icon name="ShieldAlert" className="w-8 h-8 text-blue-600 dark:text-blue-500" />
-                  <span className={isDarkMode ? 'text-white' : 'text-gray-900'}>BG Finder Pro</span>
-                </h1>
-                <p className={`mt-1 font-medium ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>
-                  Smarte Zuordnung von Berufen & Branchen zur zuständigen Unfallkasse/BG.
-                </p>
-              </div>
-              <button 
-                onClick={toggleTheme}
-                className={`p-3 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500
-                  ${isDarkMode ? 'bg-slate-800 hover:bg-slate-700 text-yellow-500' : 'bg-gray-100 hover:bg-gray-200 text-slate-700'}`}
-              >
-                {isDarkMode ? <Icon name="Sun" className="w-5 h-5" /> : <Icon name="Moon" className="w-5 h-5" />}
-              </button>
-            </header>
-
-            {/* Nur für den Ausdruck sichtbar */}
-            <div className="hidden print:block mb-8 border-b-2 border-black pb-4">
-              <h1 className="text-2xl font-bold text-black">Notfall-Information: Arbeitsunfall</h1>
-              <p className="text-sm text-gray-600">Generiert via BG Finder Pro am {new Date().toLocaleDateString()}</p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              
-              <div className="lg:col-span-2 space-y-6 print:hidden">
-                
-                {/* Suchbereich */}
-                <div className={`p-6 rounded-3xl shadow-sm border space-y-6 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-200'}`}>
-                  <div className="relative">
-                    <Icon name="Search" className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`} />
-                    <input
-                      type="text"
-                      placeholder="Beruf, Branche oder Einrichtung (z.B. Schule, Pflege, Bau)..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className={`w-full pl-14 pr-4 py-4 rounded-2xl border-2 focus:outline-none transition-colors text-lg font-medium
-                        ${isDarkMode 
-                          ? 'bg-slate-950 border-slate-700 text-white focus:border-blue-500 placeholder-slate-600' 
-                          : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 placeholder-gray-400'
-                        }`}
-                    />
-                  </div>
-
-                  {/* Verlauf Feature */}
-                  {searchHistory.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-100 dark:border-slate-800">
-                      <span className={`text-sm font-bold flex items-center gap-1.5 ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>
-                        <Icon name="History" className="w-4 h-4" /> Verlauf:
-                      </span>
-                      {searchHistory.map((term, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setSearchTerm(term)}
-                          className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500
-                            ${isDarkMode 
-                              ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white' 
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-gray-900'
-                            }`}
-                        >
-                          {term}
-                        </button>
-                      ))}
-                      <button
-                        onClick={clearHistory}
-                        title="Verlauf löschen"
-                        className={`p-1.5 ml-auto rounded-full transition-colors ${isDarkMode ? 'text-red-400 hover:bg-red-950/50' : 'text-red-500 hover:bg-red-50'}`}
-                      >
-                        <Icon name="Trash2" className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Kategorien */}
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {categories.map(cat => (
-                      <button
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat)}
-                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                          selectedCategory === cat 
-                            ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30' 
-                            : isDarkMode 
-                              ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white' 
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Suchergebnisse */}
-                <div className="space-y-6">
-                  
-                  {searchResults.exact.length > 0 && (
-                    <div className="grid gap-4">
-                      {searchResults.exact.map((prof, idx) => (
-                        <ProfessionCard key={`exact-${idx}`} prof={prof} isSuggestion={false} />
-                      ))}
-                    </div>
-                  )}
-
-                  {searchTerm && searchResults.fuzzy.length > 0 && searchResults.exact.length === 0 && (
-                    <div className="space-y-4">
-                      <div className={`flex items-center gap-2 font-bold text-lg ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
-                        <Icon name="Sparkles" className="w-5 h-5" />
-                        Meintest du eine dieser Richtungen?
-                      </div>
-                      <div className="grid gap-4">
-                        {searchResults.fuzzy.map((prof, idx) => (
-                          <ProfessionCard key={`fuzzy-${idx}`} prof={prof} isSuggestion={true} />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {searchResults.fallback && (
-                    <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-orange-950/30 border-orange-900/50 text-orange-400' : 'bg-orange-50 border-orange-200 text-orange-800'}`}>
-                      <p className="font-bold flex items-center gap-2 text-lg mb-2">
-                        <Icon name="AlertCircle" className="w-6 h-6" />
-                        Beruf nicht gefunden!
-                      </p>
-                      <p className="text-base">Dein gesuchter Begriff ist zu spezifisch. Versuche stattdessen nach der <strong>Branche</strong> oder <strong>Einrichtung</strong> zu suchen (z.B. "Bau", "Schule", "Büro", "Klinik").</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Sidebar */}
-              <div className="space-y-6 lg:col-span-1 col-span-1 w-full print:col-span-3 print:space-y-8">
-                
-                {/* Dynamische BG / UK Info */}
-                {searchTerm && (searchResults.exact.length > 0 || searchResults.fuzzy.length > 0) && (
-                  <div className="bg-blue-600 print:bg-white print:text-black print:border-2 print:border-black text-white p-6 rounded-3xl shadow-lg sticky top-8">
-                    <div className="flex justify-between items-start mb-4">
-                      <h3 className="font-bold text-lg flex items-center gap-2">
-                        <Icon name="Info" className="w-5 h-5" /> 
-                        Zuständige BG / UK
-                      </h3>
-                      <button onClick={handlePrint} className="print:hidden p-2 bg-blue-700 hover:bg-blue-800 rounded-lg transition-colors group">
-                        <Icon name="Printer" className="w-5 h-5 text-blue-200 group-hover:text-white" />
-                      </button>
-                    </div>
-                    <div className="space-y-4">
-                      {(() => {
-                        const topResult = searchResults.exact.length > 0 ? searchResults.exact[0] : searchResults.fuzzy[0];
-                        const topBg = bgData[topResult.bg];
-                        return (
-                          <div className="space-y-3">
-                            <div className="font-extrabold text-2xl print:text-3xl">{topBg.short}</div>
-                            <p className="text-sm text-blue-100 print:text-black leading-relaxed font-medium">{topBg.description}</p>
-                            
-                            <div className="pt-4 border-t border-blue-500/50 print:border-black space-y-3">
-                              <div className="flex items-center gap-3 text-sm bg-blue-700/50 print:bg-transparent p-3 rounded-xl w-full">
-                                <Icon name="Phone" className="w-5 h-5 text-blue-300 print:text-black" />
-                                <span className="font-mono font-bold flex-1 text-left text-base">{topBg.phone}</span>
-                              </div>
-                              
-                              <div className="flex items-center gap-3 text-sm bg-blue-700/50 print:bg-transparent p-3 rounded-xl w-full">
-                                <Icon name="ExternalLink" className="w-5 h-5 text-blue-300 print:text-black" />
-                                <span className="font-bold flex-1 text-left truncate">{topBg.url.replace('https://www.', '')}</span>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })()}
-                    </div>
-                  </div>
-                )}
-
-                {/* Checkliste */}
-                <div className={`p-6 rounded-3xl shadow-sm border print:shadow-none print:border-2 print:border-black print:bg-white print:text-black ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-200'}`}>
-                  <h3 className={`font-bold text-lg mb-6 flex items-center gap-2 print:text-black ${isDarkMode ? 'text-red-400' : 'text-red-600'}`}>
-                    <Icon name="ShieldAlert" className="w-6 h-6" />
-                    Unfall Checkliste
-                  </h3>
-                  <ul className="space-y-5">
-                    <li className="flex gap-3">
-                      <Icon name="CheckCircle2" className={`w-5 h-5 flex-shrink-0 mt-0.5 print:text-black ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`} />
-                      <div>
-                        <span className={`font-bold text-sm block print:text-black ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>1. Erste Hilfe</span>
-                        <span className={`text-xs mt-1 block print:text-gray-800 ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Ruhe bewahren, Unfallstelle sichern, Verletzten versorgen.</span>
-                      </div>
-                    </li>
-                    <li className="flex gap-3">
-                      <Icon name="CheckCircle2" className={`w-5 h-5 flex-shrink-0 mt-0.5 print:text-black ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`} />
-                      <div>
-                        <span className={`font-bold text-sm block print:text-black ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>2. Dokumentation</span>
-                        <span className={`text-xs mt-1 block print:text-gray-800 ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Verbandbucheintrag ist Pflicht zur rechtlichen Absicherung!</span>
-                      </div>
-                    </li>
-                    <li className="flex gap-3">
-                      <Icon name="CheckCircle2" className={`w-5 h-5 flex-shrink-0 mt-0.5 print:text-black ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`} />
-                      <div>
-                        <span className={`font-bold text-sm block print:text-black ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>3. Meldung</span>
-                        <span className={`text-xs mt-1 block print:text-gray-800 ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Arbeitgeber informieren. Meldepflicht bei mehr als 3 Tagen AU.</span>
-                      </div>
-                    </li>
-                  </ul>
-                  
-                  <div className={`mt-6 p-4 rounded-2xl border print:hidden ${isDarkMode ? 'bg-red-950/50 border-red-900/50' : 'bg-red-50 border-red-100'}`}>
-                    <p className={`text-xs font-bold leading-relaxed ${isDarkMode ? 'text-red-400' : 'text-red-800'}`}>
-                      Klinik Reminder: Nadelstichverletzungen sofort bluten lassen, spülen, dokumentieren und den Betriebsarzt aufsuchen!
-                    </p>
-                  </div>
-
-                  <div className="mt-6 pt-6 border-t border-gray-200 dark:border-slate-700 print:hidden">
-                    <h4 className="font-bold text-sm flex items-center gap-2 mb-3">
-                      <Icon name="Stethoscope" className="w-4 h-4" /> D-Arzt Vorstellung
-                    </h4>
-                    <p className={`text-xs mb-4 ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>
-                      Ist der Patient über den Unfalltag hinaus arbeitsunfähig, muss er zwingend zum Durchgangsarzt. <strong>Ihr übernehmt die Erstversorgung!</strong>
-                    </p>
-                    <a 
-                      href="https://lviweb.dguv.de/faces/arztsuche" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="w-full flex justify-center items-center gap-2 bg-gray-900 hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 dark:text-gray-900 text-white text-sm font-bold py-3 rounded-xl transition-colors"
-                    >
-                      <Icon name="Search" className="w-4 h-4" /> Offizielle D-Arzt Suche öffnen
-                    </a>
-                  </div>
-                </div>
-                
-              </div>
-            </div>
-
-            {/* Disclaimer / Haftungsausschluss */}
-            <footer className={`mt-8 pt-6 border-t text-center text-xs print:text-black print:border-black ${isDarkMode ? 'border-slate-800 text-slate-500' : 'border-gray-200 text-gray-500'}`}>
-              <p>
-                <strong className="font-semibold">Wichtiger Hinweis:</strong> Alle Angaben erfolgen ohne Gewähr. Dieses Tool dient als schnelle Orientierungshilfe für die Notaufnahme. Die tatsächliche Zuständigkeit kann in Einzelfällen (z.B. bei speziellen Entsendungen, Nebenjobs oder Subunternehmen) abweichen.
-              </p>
-            </footer>
-
-          </div>
-        </div>
-      );
-    }
-
-    // React Render Call
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-  </script>
-</body>
-</html>
+<body>
+<header class="shell top glass"><div class="brand"><div class="logo">BG</div><div><b>BG Finder</b><small>2.0 · lokal</small></div></div><div class="actions"><button id="theme" class="icon" title="Darstellung">◐</button><button id="settingsBtn" class="icon" title="Einstellungen">⚙</button></div></header>
+<main class="shell">
+<section class="hero glass"><span class="eyebrow">Gesetzliche Unfallversicherung · Schnellfinder</span><h1>Beruf oder Einrichtung eingeben.<br><span>Zuständigkeit schneller eingrenzen.</span></h1><p>Lokale Orientierungshilfe für Berufsgenossenschaften und Unfallkassen. Suchlogik, Favoriten und Nutzungsdaten bleiben auf diesem Gerät.</p><div class="search"><span class="mag">⌕</span><input id="q" type="search" placeholder="z. B. Pflege Helios, Lehrer NRW, Elektriker, Feuerwehr …"><button id="clear" class="clear" hidden>×</button></div><div id="hints" class="chips"></div></section>
+<section><div class="sectionhead"><div><span class="eyebrow">Schnellzugriff</span><h2>Top 20</h2></div><button id="resetTop" class="textbtn">Nutzung zurücksetzen</button></div><div id="top20" class="topgrid"></div><div class="sectionhead" style="margin-top:34px"><div><span class="eyebrow">Treffer</span><h2 id="title">Häufige Zuordnungen</h2></div><span id="count" class="count"></span></div><div id="results" class="results"></div></section>
+<aside><section id="detail" class="detail glass"></section><section class="notice glass"><strong>Wichtig</strong><p>Die tatsächliche Zuständigkeit hängt vom versicherten Unternehmen bzw. öffentlichen Träger ab. Bei Mischbetrieben, Leiharbeit, Subunternehmen oder Sonderzuständigkeiten kann die Berufsbezeichnung allein nicht reichen.</p></section></aside>
+</main>
+<dialog id="settings" class="glass"><div class="dialogin"><div class="dialoghead"><div><span class="eyebrow">BG Finder 2.0</span><h2>Einstellungen & Sicherung</h2></div><button id="close" class="icon">×</button></div><div class="settings">
+<section class="block"><h3>Darstellung</h3><div class="seg"><button data-t="light">Hell</button><button data-t="dark">Dunkel</button><button data-t="system">System</button></div></section>
+<section class="block"><h3>Backup</h3><p>Exportiert lokale Favoriten, Nutzung, Verlauf, Darstellung und gespeicherte UNR.S.</p><div class="row"><button id="export" class="btn primary">Backup exportieren</button><label class="btn">Backup importieren<input id="import" type="file" accept=".json,application/json" hidden></label></div></section>
+<section class="block"><h3>Unternehmensnummer</h3><p>Die UNR.S ist 15-stellig und gehört zum konkreten Unternehmen, nicht pauschal zur BG.</p><div class="row"><input id="unrs" maxlength="15" inputmode="numeric" placeholder="15-stellige UNR.S"><button id="saveUnrs" class="btn">Speichern</button></div><small id="unrsMsg"></small></section>
+<section class="block wide"><h3>Recovery</h3><p><b>Original:</b> <code>backup/original-2026-10-04</code><br><b>Entwicklung:</b> <code>feat/bg-finder-2</code></p><small>Der ursprüngliche Quellstand bleibt unabhängig von lokalen Backups wiederherstellbar.</small></section>
+<section class="block wide"><h3>Werkseinstellungen</h3><p>Setzt nur lokale App-Daten zurück. Die eingebauten Träger- und IK-Daten bleiben erhalten.</p><button id="factory" class="btn danger">Lokale Daten zurücksetzen</button></section>
+</div></div></dialog><div id="toast" class="toast"></div>
+<script>
+(function(){
+"use strict";
+var C={
+BGW:{s:"BGW",n:"Berufsgenossenschaft für Gesundheitsdienst und Wohlfahrtspflege",t:"Berufsgenossenschaft",p:"040 20207-0",u:"https://www.bgw-online.de",a:"Gesundheitsdienst, Wohlfahrtspflege und ausgewählte körpernahe Dienstleistungen im privaten oder freigemeinnützigen Bereich.",i:[["120291466","BV Hamburg"],["120392355","BV Delmenhorst"],["120592437","BV Köln"],["120592459","BV Bochum"],["120792202","BV Mainz"],["120892316","BV Karlsruhe"],["120992282","BV München"],["120992293","BV Würzburg"],["121191478","BV Berlin"],["121490083","BV Dresden"],["121590051","BV Magdeburg"]]},
+VBG:{s:"VBG",n:"Verwaltungs-Berufsgenossenschaft",t:"Berufsgenossenschaft",p:"040 5146-0",u:"https://www.vbg.de",a:"Unter anderem Büro, IT, Banken, Medien, Zeitarbeit, Sicherheitsdienste und Sport.",i:[["120990122","BV Würzburg"],["120291182","Hauptverwaltung"],["121191241","BV Berlin"],["120291193","BV Hamburg"],["120592380","BV Bielefeld"],["120592426","BV Duisburg"],["120592448","BV Bergisch Gladbach"],["120791212","BV Mainz"],["120891224","BV Ludwigsburg"],["120991236","BV München"],["121690030","BV Erfurt"],["121490016","BV Dresden"]]},
+BGBAU:{s:"BG BAU",n:"Berufsgenossenschaft der Bauwirtschaft",t:"Berufsgenossenschaft",p:"0800 3799100",u:"https://www.bgbau.de",a:"Bauwirtschaft, baunahe Gewerke und gewerbliche Gebäudereinigung.",i:[["120390887","Region Nord"],["120991009","Region Süd"],["120590925","Region Mitte"]]},
+BGETEM:{s:"BG ETEM",n:"Berufsgenossenschaft Energie Textil Elektro Medienerzeugnisse",t:"Berufsgenossenschaft",p:"0221 3778-0",u:"https://www.bgetem.de",a:"Energie, Elektro, Textil, Druck und Medienerzeugnisse.",i:[["120590446","Hauptverwaltung"]]},
+BGHM:{s:"BGHM",n:"Berufsgenossenschaft Holz und Metall",t:"Berufsgenossenschaft",p:"0800 9990080-0",u:"https://www.bghm.de",a:"Holz- und Metallbranchen einschließlich vieler Werkstatt- und Industriebetriebe.",i:[["120790335","Hauptverwaltung"],["120792235","BV Mitte"],["120792257","BV Ost"],["120792246","BV Nord"],["120792280","BV West"],["120792268","BV Südost"],["120792279","BV Südwest"]]},
+BGN:{s:"BGN",n:"Berufsgenossenschaft Nahrungsmittel und Gastgewerbe",t:"Berufsgenossenschaft",p:"0621 4456-0",u:"https://www.bgn.de",a:"Gastronomie, Beherbergung und Lebensmittelherstellung.",i:[["120890780","Hauptverwaltung"],["120990792","RD Süd München"],["120890837","RD Süd Mannheim"],["121190821","RD Nord-Ost Berlin"],["121690052","RD Nord-Ost Erfurt"],["120390810","RD Nord-Ost Hannover"],["120590801","RD West Dortmund"],["120790847","RD West Mainz"]]},
+BGRCI:{s:"BG RCI",n:"Berufsgenossenschaft Rohstoffe und chemische Industrie",t:"Berufsgenossenschaft",p:"06221 5108-0",u:"https://www.bgrci.de",a:"Rohstoffe, Bergbau, Chemie, Papier und verwandte Industriezweige.",i:[["120892588","BG RCI"]]},
+BGVERKEHR:{s:"BG Verkehr",n:"Berufsgenossenschaft Verkehrswirtschaft Post-Logistik Telekommunikation",t:"Berufsgenossenschaft",p:"040 3980-0",u:"https://www.bg-verkehr.de",a:"Verkehr, Transport, Entsorgung, Post-Logistik, Telekommunikation und Luftfahrt.",i:[["120291319","BV Hamburg"],["120292412","BV Hamburg Berufskrankheiten"],["120391321","BV Hannover"],["120591334","BV Wuppertal"],["120691346","BV Wiesbaden"],["120991350","BV München"],["121191309","BV Berlin"],["121490061","BV Dresden"],["120892305","BV Tübingen Unfallabteilung"],["120392399","Unfallfürsorge Beamte Post/Telekom Tübingen"]]},
+BGHW:{s:"BGHW",n:"Berufsgenossenschaft Handel und Warenlogistik",t:"Berufsgenossenschaft",p:"0621 183-0",u:"https://www.bghw.de",a:"Einzelhandel, Großhandel, Warenlogistik und Lagerwirtschaft.",i:[["120491151","RD Nord"],["120591130","Direktion Bonn"],["120591141","RD West"],["120891053","Hauptverwaltung"],["120891100","RD Südwest"],["120991112","RD Südost"],["121191172","RD Ost"]]},
+SVLFG:{s:"SVLFG",n:"Sozialversicherung für Landwirtschaft, Forsten und Gartenbau · Landwirtschaftliche Berufsgenossenschaft",t:"Landwirtschaftliche Berufsgenossenschaft",p:"0561 785-0",u:"https://www.svlfg.de",a:"Landwirtschaft, Forsten und Gartenbau.",i:[["120692702","Standort Kassel, keine Hörgeräte"],["121192925","Hörgeräte Kompetenzzentrum"]]},
+UKBW:{s:"UK BW",n:"Unfallkasse Baden-Württemberg",t:"Unfallkasse",u:"https://www.ukbw.de",a:"Öffentlicher Bereich Baden-Württemberg.",i:[["120891838","Rehabilitation"]]},
+BYLUK:{s:"Bayer. LUK",n:"Bayerische Landesunfallkasse",t:"Unfallkasse",u:"https://www.kuvb.de",a:"Landesbereich Bayern.",i:[["120991942","Bayerische Landesunfallkasse"]]},
+KUVB:{s:"KUVB",n:"Kommunale Unfallversicherung Bayern",t:"Unfallkasse",u:"https://www.kuvb.de",a:"Kommunaler Bereich Bayern.",i:[["120991737","KUVB"]]},
+UKBERLIN:{s:"UK Berlin",n:"Unfallkasse Berlin",t:"Unfallkasse",u:"https://www.unfallkasse-berlin.de",a:"Öffentlicher Bereich Berlin.",i:[["121191913","Unfallkasse Berlin"]]},
+UKBB:{s:"UK Brandenburg",n:"Unfallkasse Brandenburg",t:"Unfallkasse",u:"https://www.ukbb.de",a:"Öffentlicher Bereich Brandenburg.",i:[["121290003","Unfallkasse Brandenburg"]]},
+FUKBB:{s:"FUK Brandenburg",n:"Feuerwehr-Unfallkasse Brandenburg",t:"Feuerwehr-Unfallkasse",u:"https://www.ukbb.de",a:"Feuerwehr-Unfallversicherung Brandenburg.",i:[["121290025","Feuerwehr-Unfallkasse Brandenburg"]]},
+UKBREMEN:{s:"UK Bremen",n:"Unfallkasse Freie Hansestadt Bremen",t:"Unfallkasse",u:"https://www.unfallkasse.bremen.de",a:"Öffentlicher Bereich Bremen.",i:[["120491754","Unfallkasse Bremen"]]},
+UKH:{s:"UK Hessen",n:"Unfallkasse Hessen",t:"Unfallkasse",u:"https://www.ukh.de",a:"Öffentlicher Bereich Hessen.",i:[["120692198","Unfallkasse Hessen"]]},
+UKMV:{s:"UK MV",n:"Unfallkasse Mecklenburg-Vorpommern",t:"Unfallkasse",u:"https://www.uk-mv.de",a:"Öffentlicher Bereich Mecklenburg-Vorpommern.",i:[["121390015","Unfallkasse Mecklenburg-Vorpommern"]]},
+LUKN:{s:"LUK Niedersachsen",n:"Landesunfallkasse Niedersachsen",t:"Unfallkasse",u:"https://www.lukn.de",a:"Landesbereich Niedersachsen.",i:[["120391968","Landesunfallkasse Niedersachsen"]]},
+GUVH:{s:"GUV Hannover",n:"Gemeinde-Unfallversicherungsverband Hannover",t:"Gemeindeunfallversicherung",u:"https://www.guvh.de",a:"Kommunaler Bereich im Zuständigkeitsgebiet Hannover.",i:[["120391764","GUVV Hannover"]]},
+BSGUV:{s:"GUV Braunschweig",n:"Braunschweigischer Gemeinde-Unfallversicherungsverband",t:"Gemeindeunfallversicherung",u:"https://www.bs-guv.de",a:"Kommunaler Bereich im Zuständigkeitsgebiet Braunschweig.",i:[["120391742","Braunschweigischer GUVV"]]},
+GUVOLD:{s:"GUV Oldenburg",n:"Gemeinde-Unfallversicherungsverband Oldenburg",t:"Gemeindeunfallversicherung",u:"https://www.guv-oldenburg.de",a:"Kommunaler Bereich Oldenburg.",i:[["120391786","GUVV Oldenburg"]]},
+FUKN:{s:"FUK Niedersachsen",n:"Feuerwehr-Unfallkasse Niedersachsen",t:"Feuerwehr-Unfallkasse",u:"https://www.fuk.de",a:"Feuerwehr-Unfallversicherung Niedersachsen.",i:[["120392333","Feuerwehr-Unfallkasse Niedersachsen"]]},
+UKNORD:{s:"UK Nord",n:"Unfallkasse Nord",t:"Unfallkasse",u:"https://www.uk-nord.de",a:"Öffentlicher Bereich Hamburg und Schleswig-Holstein.",i:[["120291934","Standorte Hamburg und Kiel"]]},
+HFUKN:{s:"HFUK Nord",n:"Hanseatische Feuerwehr-Unfallkasse Nord",t:"Feuerwehr-Unfallkasse",u:"https://www.hfuk-nord.de",a:"Feuerwehr-Unfallversicherung Hamburg, Mecklenburg-Vorpommern und Schleswig-Holstein.",i:[["120292321","LGSt Hamburg"],["121390059","LGSt Mecklenburg-Vorpommern"],["120192397","LGSt Schleswig-Holstein"]]},
+UKNRW:{s:"UK NRW",n:"Unfallkasse Nordrhein-Westfalen",t:"Unfallkasse",p:"0211 9024-0",u:"https://www.unfallkasse-nrw.de",a:"Öffentlicher Bereich in Nordrhein-Westfalen, unter anderem Schulen und kommunale Einrichtungen.",i:[["120591802","Regionaldirektion Rheinland"],["120591824","Regionaldirektion Westfalen-Lippe"]]},
+UKRLP:{s:"UK RLP",n:"Unfallkasse Rheinland-Pfalz",t:"Unfallkasse",u:"https://www.ukrlp.de",a:"Öffentlicher Bereich Rheinland-Pfalz.",i:[["120791791","Unfallkasse Rheinland-Pfalz"]]},
+UKS:{s:"UK Saarland",n:"Unfallkasse Saarland",t:"Unfallkasse",u:"https://www.uks.de",a:"Öffentlicher Bereich Saarland.",i:[["121091843","Unfallkasse Saarland"]]},
+UKSN:{s:"UK Sachsen",n:"Unfallkasse Sachsen",t:"Unfallkasse",u:"https://www.unfallkassesachsen.de",a:"Öffentlicher Bereich Sachsen.",i:[["121490118","Unfallkasse Sachsen"]]},
+UKST:{s:"UK Sachsen-Anhalt",n:"Unfallkasse Sachsen-Anhalt",t:"Unfallkasse",u:"https://www.ukst.de",a:"Öffentlicher Bereich Sachsen-Anhalt.",i:[["121590039","Unfallkasse Sachsen-Anhalt"]]},
+UKT:{s:"UK Thüringen",n:"Unfallkasse Thüringen",t:"Unfallkasse",u:"https://www.ukt.de",a:"Öffentlicher Bereich Thüringen.",i:[["121690063","Unfallkasse Thüringen"]]},
+UVB:{s:"UVB",n:"Unfallversicherung Bund und Bahn",t:"Unfallkasse",p:"069 47863-0",u:"https://www.uv-bund-bahn.de",a:"Unfallversicherung für weite Teile des Bundesbereichs und der Bahn.",i:[["120392037","Unfallversicherung Bund und Bahn"]]},
+FUKMITTE:{s:"FUK Mitte",n:"Feuerwehr-Unfallkasse Mitte",t:"Feuerwehr-Unfallkasse",u:"https://www.fuk-mitte.de",a:"Feuerwehr-Unfallversicherung Sachsen-Anhalt und Thüringen.",i:[["121590040","LGSt Sachsen-Anhalt"],["121690096","LGSt Thüringen"]]}
+};
+function P(id,n,cat,c,k,ctx,prio){return{id:id,n:n,cat:cat,c:c,k:k,ctx:ctx,prio:prio||0}}
+var PFS=[
+P("pflege-privat","Pflegefachkraft · private/freigemeinnützige Klinik","Gesundheit","BGW",["pflege","pfleger","krankenschwester","krankenpfleger","fachpflege","notaufnahme","zna","helios","asklepios","sana","privatklinik"],"Bei privaten oder freigemeinnützigen Einrichtungen typischerweise BGW. Arbeitgeber und Trägerschaft prüfen.",100),
+P("pflege-oeff","Pflegefachkraft · kommunales/öffentliches Krankenhaus","Öffentlicher Dienst","UKNRW",["pflege","krankenpfleger","krankenschwester","kommunal","städtisch","stadtklinik","uniklinik","universitätsklinikum","öffentlich","nrw"],"Für NRW als öffentlicher Träger häufig UK NRW. Bei anderen Bundesländern die regionale Unfallkasse wählen.",94),
+P("arzt","Arzt/Ärztin · Praxis oder private Klinik","Gesundheit","BGW",["arzt","ärztin","doktor","praxis","hausarzt","facharzt","chirurg","privatklinik"],"Niedergelassene und private Einrichtungen typischerweise BGW.",96),
+P("mfa","Medizinische Fachangestellte · Praxis","Gesundheit","BGW",["mfa","arzthelfer","arzthelferin","praxis","sprechstundenhilfe"],"Praxisbereich typischerweise BGW.",88),
+P("physio","Physiotherapeut/in","Gesundheit","BGW",["physio","physiotherapie","krankengymnastik","rehapraxis","therapie"],"Private oder freigemeinnützige Gesundheitsdienste typischerweise BGW.",83),
+P("rettung","Rettungsdienst · Hilfsorganisation / privater Träger","Gesundheit","BGW",["rettungssanitäter","notfallsanitäter","rettungsdienst","rtw","ktw","drk","johanniter","malteser","asb"],"Die konkrete Trägerschaft ist entscheidend. Bei Hilfsorganisationen oder privaten Trägern häufig BGW.",92),
+P("feuerwehr-nrw","Feuerwehr · kommunal NRW","Öffentlicher Dienst","UKNRW",["feuerwehr","berufsfeuerwehr","freiwillige feuerwehr","brandmeister","rettungsdienst stadt","kommune","nrw"],"In NRW liegt die öffentliche Unfallversicherung regelmäßig bei der UK NRW. Sonderzuständigkeiten prüfen.",97),
+P("lehrer-nrw","Lehrer/in · staatliche Schule NRW","Öffentlicher Dienst","UKNRW",["lehrer","lehrerin","schule","gymnasium","grundschule","gesamtschule","berufskolleg","nrw"],"Öffentliche Schulen in NRW: regelmäßig UK NRW.",99),
+P("schueler-nrw","Schüler/in · öffentliche Schule NRW","Bildung","UKNRW",["schüler","schülerin","schule","schulunfall","schulweg","pause","sportunterricht","nrw"],"Gesetzlicher Unfallversicherungsschutz über den öffentlichen Unfallversicherungsträger.",98),
+P("kita-stadt","Kita · städtischer Träger NRW","Öffentlicher Dienst","UKNRW",["kita","kindergarten","erzieher","erzieherin","städtisch","stadt","kommune","nrw"],"Bei kommunaler Trägerschaft in NRW regelmäßig UK NRW.",86),
+P("kita-privat","Kita · privater/kirchlicher Träger","Soziales","BGW",["kita","kindergarten","erzieher","kirche","caritas","diakonie","privat","freier träger"],"Bei privater oder freigemeinnütziger Trägerschaft häufig BGW.",78),
+P("kommune","Kommunalverwaltung · Rathaus NRW","Öffentlicher Dienst","UKNRW",["rathaus","stadtverwaltung","kommune","bürgerbüro","ordnungsamt","verwaltung","nrw"],"Für kommunale Beschäftigte in NRW typischerweise UK NRW.",77),
+P("bundespolizei","Bundespolizei","Bund","UVB",["bundespolizei","bupo","bund","grenzschutz","bahnhof polizei"],"Bundesbereich, regelmäßig UVB.",82),
+P("bahn","Bahn / Eisenbahnunternehmen im UVB-Bereich","Verkehr","UVB",["bahn","deutsche bahn","db","eisenbahn","zugbegleiter","lokführer"],"UVB ist unter anderem für den Bahnbereich zuständig. Konkretes Unternehmen prüfen.",75),
+P("maurer","Maurer/in · Betonbau","Bau","BGBAU",["maurer","betonbauer","baustelle","hochbau","rohbau","mauer"],"Typischer Baubetrieb: BG BAU.",95),
+P("dachdecker","Dachdecker/in","Bau","BGBAU",["dachdecker","dach","ziegel","abdichtung","baustelle"],"Typischer Baubetrieb: BG BAU.",84),
+P("fliesen","Fliesenleger/in","Bau","BGBAU",["fliesenleger","fliese","bodenleger","fugen","bad"],"Typischer Baubetrieb: BG BAU.",65),
+P("reinigung","Gebäudereiniger/in · gewerblich","Reinigung","BGBAU",["gebäudereinigung","putzkraft","reinigung","reiniger","fensterputzer"],"Gewerbliche Gebäudereinigung gehört typischerweise zur BG BAU.",89),
+P("kfz","Kfz-Mechatroniker/in","Handwerk","BGHM",["kfz","mechatroniker","autowerkstatt","werkstatt","mechaniker","auto"],"Holz-/Metallbereich, typischerweise BGHM.",93),
+P("metall","Metallbauer/in · Schlosser/in","Handwerk","BGHM",["metallbauer","schlosser","stahlbau","schweißer","schweissen","metall"],"Typischerweise BGHM.",80),
+P("tischler","Tischler/in · Schreiner/in","Handwerk","BGHM",["tischler","schreiner","holz","möbelbau","holzwerkstatt"],"Typischerweise BGHM.",79),
+P("elektriker","Elektriker/in · Elektroniker/in","Elektro","BGETEM",["elektriker","elektroniker","strom","elektro","kabel","spannung","installation"],"Typischer Elektrofachbetrieb: BG ETEM.",100),
+P("software","Softwareentwickler/in · IT","IT","VBG",["softwareentwickler","programmierer","developer","it","informatiker","coder","webentwickler"],"Büro-/IT-Dienstleistungsbereich typischerweise VBG.",91),
+P("sysadmin","IT-Systemadministrator/in","IT","VBG",["sysadmin","administrator","it","server","netzwerk","helpdesk"],"Büro-/IT-Dienstleistungsbereich typischerweise VBG.",76),
+P("bank","Bank / Bankkaufmann","Finanzen","VBG",["bank","bankkaufmann","bankkauffrau","finanzen","kreditinstitut"],"Typischerweise VBG.",67),
+P("buero","Büromanagement / kaufmännische Dienstleistung","Verwaltung","VBG",["büro","kaufmann","kauffrau","office","sekretariat","assistenz"],"Private Verwaltungs-/Dienstleistungsbetriebe typischerweise VBG.",87),
+P("security","Sicherheitsdienst","Dienstleistung","VBG",["security","sicherheitsdienst","wachdienst","objektschutz","türsteher"],"Typischerweise VBG.",62),
+P("zeitarbeit","Zeitarbeit / Leiharbeit","Dienstleistung","VBG",["zeitarbeit","leiharbeit","personaldienstleister","leasing"],"Bei Arbeitnehmerüberlassung typischerweise VBG. Der Einsatzbetrieb allein ist nicht entscheidend.",85),
+P("redaktion","Redaktion / Journalismus / Online-Medien","Medien","VBG",["redakteur","journalist","online redaktion","medien","content","testsieger","autor"],"Medien- und Dienstleistungsbereich häufig VBG.",69),
+P("sport","Sportverein / Profisport","Sport","VBG",["sportverein","fußballverein","trainer","profisport","athlet","verein"],"Sportvereine gehören typischerweise zum Zuständigkeitsbereich der VBG.",74),
+P("einzelhandel","Einzelhandel / Verkäufer/in","Handel","BGHW",["einzelhandel","verkäufer","verkäuferin","supermarkt","laden","filiale","kasse","store"],"Typischerweise BGHW.",98),
+P("lager","Lager / Kommissionierung / Warenlogistik","Logistik","BGHW",["lagerist","lagerlogistik","kommissionierer","gabelstapler","stapler","wareneingang","lager"],"Warenlogistik typischerweise BGHW.",97),
+P("lkw","Lkw-Fahrer/in · Spedition","Verkehr","BGVERKEHR",["lkw fahrer","lkw-fahrer","berufskraftfahrer","spedition","trucker","fernfahrer","transport"],"Verkehr und Transport typischerweise BG Verkehr.",99),
+P("bus","Busfahrer/in · Verkehrsunternehmen","Verkehr","BGVERKEHR",["busfahrer","linienbus","reisebus","verkehrsbetrieb","öpnv"],"Bei privatwirtschaftlichen Verkehrsunternehmen häufig BG Verkehr. Kommunale Betriebe können abweichen.",81),
+P("kurier","Kurier / Paketdienst / Zustellung","Verkehr","BGVERKEHR",["kurier","paketdienst","zusteller","zustellung","lieferdienst","post logistik"],"Je nach Unternehmen häufig BG Verkehr. Arbeitgeberzweck prüfen.",84),
+P("koch","Koch/Köchin · Restaurant","Gastronomie","BGN",["koch","köchin","küche","restaurant","gastronomie","kantine privat"],"Typischer Gastronomiebetrieb: BGN.",96),
+P("service","Servicekraft · Gastronomie","Gastronomie","BGN",["servicekraft","kellner","kellnerin","gastronomie","restaurant","bar","cafe","café"],"Typischer Gastronomiebetrieb: BGN.",90),
+P("baecker","Bäcker/in","Lebensmittel","BGN",["bäcker","bäckerei","backstube","brot","konditor"],"Typischerweise BGN.",79),
+P("chemie","Chemielabor / Chemieindustrie","Industrie","BGRCI",["chemie","chemielaborant","chemikant","labor chemie","chemiewerk"],"Chemische Industrie typischerweise BG RCI.",86),
+P("bergbau","Bergbau","Industrie","BGRCI",["bergbau","mine","zeche","bergmann","rohstoffe"],"Typischerweise BG RCI.",54),
+P("landwirtschaft","Landwirt/in","Landwirtschaft","SVLFG",["landwirt","bauer","landwirtschaft","hof","ackerbau","viehzucht"],"Landwirtschaftliche Berufsgenossenschaft innerhalb der SVLFG.",92),
+P("forst","Forstwirtschaft","Landwirtschaft","SVLFG",["forstwirt","forst","waldarbeiter","holzernte"],"Landwirtschaftliche Berufsgenossenschaft innerhalb der SVLFG.",65)
+];
+var DEF=["pflege-privat","lehrer-nrw","elektriker","lkw","einzelhandel","lager","maurer","kfz","feuerwehr-nrw","schueler-nrw","arzt","koch","software","rettung","reinigung","mfa","zeitarbeit","pflege-oeff","kita-stadt","landwirtschaft"];
+var H=["Pflege Helios","Lehrer NRW","Elektriker","Feuerwehr NRW","Lkw Fahrer","Kfz Werkstatt","Schüler NRW","Koch Restaurant"];
+var K="bgFinder2State";var st={theme:"system",usage:{},favorites:[],history:[],unrs:"",last:null};
+try{st=Object.assign(st,JSON.parse(localStorage.getItem(K)||"{}"))}catch(e){}
+function save(){localStorage.setItem(K,JSON.stringify(st))}
+function n(s){return(s||"").toLocaleLowerCase("de-DE").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ß/g,"ss").replace(/[^a-z0-9]+/g," ").trim()}
+function esc(s){return(s||"").replace(/[&<>'"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]})}
+function score(p,q){if(!q)return p.prio;var x=n(q),ts=x.split(/\s+/),title=n(p.n),cat=n(p.cat),ctx=n(p.ctx),ks=p.k.map(n),c=C[p.c],v=0;if(title===x)v+=180;if(title.indexOf(x)>-1)v+=95;if(cat.indexOf(x)>-1)v+=34;if(n(c.s).indexOf(x)>-1||n(c.n).indexOf(x)>-1)v+=52;ks.forEach(function(k){if(k===x)v+=120;else if(k.indexOf(x)>-1||x.indexOf(k)>-1)v+=62});var m=0;ts.forEach(function(t){var hit=false;if(title.indexOf(t)>-1){v+=24;hit=true}if(cat.indexOf(t)>-1){v+=8;hit=true}if(ctx.indexOf(t)>-1){v+=6;hit=true}ks.forEach(function(k){if(k===t){v+=34;hit=true}else if(k.indexOf(t)>-1||t.indexOf(k)>-1){v+=14;hit=true}});if(hit)m++});if(ts.length>1&&m===ts.length)v+=80;if(/nrw|nordrhein/.test(x)&&p.c==="UKNRW")v+=45;if(/helios|asklepios|sana|privat/.test(x)&&p.c==="BGW")v+=55;if(/stadt|kommunal|offentlich|schule|rathaus/.test(x)&&p.c==="UKNRW")v+=20;return v}
+function find(q){return PFS.map(function(p){return{p:p,s:score(p,q)}}).filter(function(x){return x.s>0}).sort(function(a,b){return b.s-a.s||b.p.prio-a.p.prio}).slice(0,q?18:12)}
+var $=function(id){return document.getElementById(id)},q=$("q"),res=$("results"),detail=$("detail"),top=$("top20"),toastEl=$("toast");
+function toast(s){toastEl.textContent=s;toastEl.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(function(){toastEl.classList.remove("show")},1800)}
+function top20(){var fav=new Set(st.favorites);return PFS.map(function(p){return{p:p,s:(st.usage[p.id]||0)*1000+(fav.has(p.id)?500:0)+(DEF.indexOf(p.id)>-1?100:0)+p.prio}}).sort(function(a,b){return b.s-a.s}).slice(0,20).map(function(x){return x.p})}
+function renderTop(){top.innerHTML=top20().map(function(p,i){return'<button class="topcard" data-id="'+p.id+'"><span class="rank">#'+(i+1)+'</span><span class="topname">'+esc(p.n)+'</span><span class="carrier">'+esc(C[p.c].s)+'</span></button>'}).join("")}
+function render(qs){var a=find(qs);$("title").textContent=qs?'Ergebnisse für „'+qs+'“':"Häufige Zuordnungen";$("count").textContent=a.length+" Treffer";if(!a.length){res.innerHTML='<div class="nores"><b>Kein sicherer Treffer.</b><br>Ergänze Branche, Arbeitgebertyp oder Einrichtung, z. B. „Pflege städtisch NRW“.</div>';return}res.innerHTML=a.map(function(x){var p=x.p,c=C[p.c],conf=x.s>=160?"sehr passend":x.s>=90?"passend":"möglicher Treffer";return'<button class="result" data-id="'+p.id+'"><div><div class="resulttitle">'+esc(p.n)+'</div><div class="meta"><span class="pill">'+esc(p.cat)+'</span><span class="pill">'+conf+'</span></div></div><div class="tag">'+esc(c.s)+'</div></button>'}).join("")}
+function empty(){detail.classList.remove("has-selection");detail.innerHTML='<div class="empty"><div class="emptyi">⌕</div><h3>Suchergebnis auswählen</h3><p>Hier erscheinen Zuständigkeit, IK-Nummern, Kontakt und die Begründung der Zuordnung.</p></div>'}
+function select(id,count){var p=PFS.find(function(x){return x.id===id});if(!p)return;var c=C[p.c];detail.classList.add("has-selection");if(count!==false){st.usage[id]=(st.usage[id]||0)+1;st.last=id;save();renderTop()}var f=st.favorites.indexOf(id)>-1;var ik=c.i.map(function(x){return'<div class="ik"><code>'+x[0]+'</code><span>'+esc(x[1])+'</span></div>'}).join("");detail.innerHTML='<div class="detailhead"><div><span class="eyebrow">'+esc(c.s)+' · '+esc(c.t)+'</span><h3>'+esc(c.n)+'</h3></div><button class="fav '+(f?"active":"")+'" data-fav="'+id+'">★</button></div><p>'+esc(c.a)+'</p><div class="dsec"><div class="dlabel">Warum dieser Treffer?</div><p>'+esc(p.ctx)+'</p></div><div class="dsec"><div class="dlabel">Institutionskennzeichen (IK)</div><div class="iklist">'+ik+'</div><p><small>Bei regionalen IKs die konkrete Zuständigkeit des Trägers prüfen.</small></p></div><div class="dsec"><div class="dlabel">Kontakt</div><div class="contacts">'+(c.p?'<a class="contact" href="tel:'+c.p.replace(/\s/g,"")+'">'+esc(c.p)+'</a>':'')+'<a class="contact" target="_blank" rel="noopener" href="'+c.u+'">Website öffnen</a></div></div>'+(st.unrs?'<div class="dsec"><div class="dlabel">Gespeicherte UNR.S</div><div class="ik"><code>'+st.unrs+'</code><span>dein Unternehmen</span></div></div>':'');st.history=[id].concat(st.history.filter(function(x){return x!==id})).slice(0,10);save();if(window.innerWidth<=720){setTimeout(function(){detail.scrollIntoView({behavior:"smooth",block:"start"})},40)}}
+function setTheme(t){st.theme=t;document.documentElement.dataset.theme=t;save();document.querySelectorAll("[data-t]").forEach(function(b){b.classList.toggle("active",b.dataset.t===t)})}
+$("hints").innerHTML=H.map(function(h){return'<button class="chip" data-h="'+esc(h)+'">'+esc(h)+'</button>'}).join("");
+q.addEventListener("input",function(){var v=q.value.trim();$("clear").hidden=!v;render(v)});$("clear").onclick=function(){q.value="";$("clear").hidden=true;render("");q.focus()};
+document.addEventListener("click",function(e){var h=e.target.closest("[data-h]");if(h){q.value=h.dataset.h;$("clear").hidden=false;render(q.value)}var c=e.target.closest("[data-id]");if(c)select(c.dataset.id);var f=e.target.closest("[data-fav]");if(f){e.stopPropagation();var id=f.dataset.fav;if(st.favorites.indexOf(id)>-1)st.favorites=st.favorites.filter(function(x){return x!==id});else st.favorites.push(id);save();select(id,false);renderTop();toast(st.favorites.indexOf(id)>-1?"Favorit gespeichert":"Favorit entfernt")}});
+$("theme").onclick=function(){var a=["system","light","dark"],i=a.indexOf(st.theme);setTheme(a[(i+1)%a.length]);toast("Darstellung: "+st.theme)};$("settingsBtn").onclick=function(){$("settings").showModal()};$("close").onclick=function(){$("settings").close()};document.querySelectorAll("[data-t]").forEach(function(b){b.onclick=function(){setTheme(b.dataset.t)}});
+$("resetTop").onclick=function(){st.usage={};save();renderTop();toast("Top 20 zurückgesetzt")};
+$("export").onclick=function(){var p={app:"BG Finder 2.0",backupVersion:1,createdAt:new Date().toISOString(),state:st};var blob=new Blob([JSON.stringify(p,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="bg-finder-backup-"+new Date().toISOString().slice(0,10)+".json";a.click();URL.revokeObjectURL(a.href);toast("Backup exportiert")};
+$("import").onchange=async function(e){try{var p=JSON.parse(await e.target.files[0].text());if(p.app!=="BG Finder 2.0"||p.backupVersion!==1||!p.state)throw 0;st=Object.assign({theme:"system",usage:{},favorites:[],history:[],unrs:"",last:null},p.state);save();apply();toast("Backup wiederhergestellt")}catch(x){toast("Backup ungültig")}e.target.value=""};
+$("saveUnrs").onclick=function(){var v=$("unrs").value.replace(/\D/g,"");if(v&&v.length!==15){$("unrsMsg").textContent="Die UNR.S muss 15-stellig sein.";return}st.unrs=v;save();$("unrsMsg").textContent=v?"Gespeichert.":"Entfernt.";if(st.last)select(st.last,false);toast(v?"UNR.S gespeichert":"UNR.S entfernt")};
+$("factory").onclick=function(){if(!confirm("Wirklich alle lokalen BG-Finder-Daten zurücksetzen?"))return;localStorage.removeItem(K);st={theme:"system",usage:{},favorites:[],history:[],unrs:"",last:null};apply();toast("Lokale Daten zurückgesetzt")};
+function apply(){setTheme(st.theme||"system");$("unrs").value=st.unrs||"";renderTop();render(q.value.trim());if(st.last)select(st.last,false);else empty()}
+if("serviceWorker" in navigator && location.protocol!=="file:"){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(){})})}
+apply();
+})();
+</script>
+</body></html>
